@@ -22,7 +22,7 @@ class User
     private \DateTime $birthDate;
 
     #[ORM\Column(name: 'birth_time', type: 'time', nullable: false)]
-    private \DateTime $birth_time;
+    private \DateTime $birthTime;
 
     public function getId(): int
     {
@@ -70,12 +70,12 @@ class User
 
     public function getBirthTime(): \DateTime
     {
-        return $this->birth_time;
+        return $this->birthTime;
     }
 
-    public function setBirthTime(\DateTime $birth_time): User
+    public function setBirthTime(\DateTime $birthTime): User
     {
-        $this->birth_time = $birth_time;
+        $this->birthTime = $birthTime;
         return $this;
     }
 

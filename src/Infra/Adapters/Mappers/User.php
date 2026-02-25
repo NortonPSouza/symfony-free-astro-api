@@ -21,8 +21,18 @@ class User
     #[ORM\Column(name: 'birth_date', type: 'date', nullable: false)]
     private \DateTime $birthDate;
 
-    #[ORM\Column(name: 'birth_time', type: 'time', nullable: false)]
-    private \DateTime $birthTime;
+    #[ORM\Column(name: 'birth_time', type: 'time', nullable: true)]
+    private ?\DateTime $birthTime;
+
+    #[ORM\ManyToOne(targetEntity: Zodiac::class)]
+    #[ORM\JoinColumn(name: 'zodiac_id', referencedColumnName: 'id', nullable: true)]
+    private ?Zodiac $zodiac;
+
+    public function __construct()
+    {
+        $this->setBirthTime(null);
+        $this->setZodiac(null);
+    }
 
     public function getId(): int
     {
@@ -68,16 +78,26 @@ class User
         return $this;
     }
 
-    public function getBirthTime(): \DateTime
+    public function getBirthTime(): ?\DateTime
     {
         return $this->birthTime;
     }
 
-    public function setBirthTime(\DateTime $birthTime): User
+    public function setBirthTime(?\DateTime $birthTime): User
     {
         $this->birthTime = $birthTime;
         return $this;
     }
 
+    public function getZodiac(): ?Zodiac
+    {
+        return $this->zodiac;
+    }
+
+    public function setZodiac(?Zodiac $zodiac): User
+    {
+        $this->zodiac = $zodiac;
+        return $this;
+    }
 
 }

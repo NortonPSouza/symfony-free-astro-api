@@ -15,6 +15,8 @@ readonly class CreateUserInput implements ArraySerializationInterface
     public function __construct(
         private string $name,
         private string $familyName,
+        private string $password,
+        private string $email,
         private \DateTime $birthDate,
         private ?\DateTime $birthTime,
     )
@@ -34,6 +36,8 @@ readonly class CreateUserInput implements ArraySerializationInterface
         return new CreateUserInput(
             $inputRequest['name'],
             $inputRequest['familyName'],
+            $inputRequest['password'],
+            $inputRequest['email'],
             new \DateTime($inputRequest['birthDate']),
             new \DateTime($inputRequest['birthTime']) ?? null
         );
@@ -47,6 +51,16 @@ readonly class CreateUserInput implements ArraySerializationInterface
     public function getFamilyName(): string
     {
         return $this->familyName;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
     }
 
     public function getBirthDate(): \DateTime
@@ -65,6 +79,8 @@ readonly class CreateUserInput implements ArraySerializationInterface
         return [
             "name" => $this->name,
             "family_name" => $this->familyName,
+            "password" => $this->password,
+            "email" => $this->email,
             "birth_date" => $this->birthDate,
             "birth_time" => $this->birthTime
         ];

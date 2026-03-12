@@ -6,6 +6,7 @@ use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
+use App\Infra\Adapters\Encoder\BcryptPasswordEncoder;
 use App\Infra\Adapters\Repository\UserRepository;
 use App\Infra\Adapters\Repository\ZodiacRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,7 +39,8 @@ final class User extends AbstractController
             zodiacRepository: $zodiacRepository
         );
         $input = CreateUserInput::fromArray($request->request->all());
-        $output = $createUserUseCase->execute(input: $input);
+        $passwordEncoder = new BcryptPasswordEncoder();
+        $output = $createUserUseCase->execute(input: $input, passwordEncoder: $passwordEncoder);
         return new JsonResponse($output->jsonSerialize(), $output->getCode());
     }
 }

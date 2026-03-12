@@ -10,7 +10,6 @@ RUN apt update && apt install -y \
 # Install PHP Extensions (Symfony requirements)
 RUN docker-php-ext-install \
     zip sockets pdo pdo_mysql intl
-
 #  Install MySQL
 RUN docker-php-ext-install pdo &&  \
     docker-php-ext-install pdo_mysql &&  \

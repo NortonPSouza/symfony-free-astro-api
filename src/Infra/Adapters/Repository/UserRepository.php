@@ -6,6 +6,8 @@ use App\App\Contracts\UserRepositoryInterface;
 use App\Domain\Exceptions\RepositoryException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Domain\Entity\User;
+use App\Infra\Adapters\Mappers\Login;
+use App\Infra\Adapters\Mappers\LoginUser;
 use App\Infra\Adapters\Mappers\User as UserMapper;
 use Doctrine\DBAL\Exception;
 
@@ -19,43 +21,42 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @throws Exception
      * @throws RepositoryException
      */
-    public function create(User $user): ?array
+    public function create(User $user): array
     {
-       $this->connection->begin();
         try {
             $entityManager = $this->connection->getEntityManager();
             $userMapper = new UserMapper();
             $userMapper
-                ->setName($user->name)
-                ->setFamilyName($user->familyName)
-                ->setBirthDate($user->birthDate)
-                ->setBirthTime($user->birthTime);
+                ->setName($user->getName())
+                ->setFamilyName($user->getFamilyName())
+                ->setBirthDate($user->getBirthDate())
+                ->setBirthTime($user->getBirthTime())
+                ->setZodiac($user->getZodiac());
             $entityManager->persist($userMapper);
+            $loginMapper = new Login();
+            $loginMapper
+                ->setEmail($user->getEmail())
+                ->setPassword($user->getPassword());
+            $entityManager->persist($loginMapper);
+            $loginUserMapper = new LoginUser();
+            $loginUserMapper
+                ->setLogin($loginMapper)
+                ->setUser($userMapper);
+            $entityManager->persist($loginUserMapper);
+            $entityManager->flush();
             return [
                 'id' => $userMapper->getId()
             ];
         } catch (\Exception $exception) {
-            $this->connection->rollback();
             throw new RepositoryException($exception->getMessage());
         }
-    }
-
-    public function list(): ?array
-    {
-        return [];
     }
 
     public function find(int $id): ?UserMapper
     {
        return null;
-    }
-
-    public function update(int $id): ?array
-    {
-        return [];
     }
 
     public function delete(int $id): ?array

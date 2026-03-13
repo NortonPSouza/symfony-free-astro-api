@@ -9,13 +9,12 @@ use App\Domain\Entity\User;
 use App\Infra\Adapters\Mappers\Login;
 use App\Infra\Adapters\Mappers\LoginUser;
 use App\Infra\Adapters\Mappers\User as UserMapper;
-use Doctrine\DBAL\Exception;
 
 readonly class UserRepository implements UserRepositoryInterface
 {
 
     public function __construct(
-        private ConnectionDoctrine $connection,
+        private ConnectionDoctrine $connection
     )
     {
     }
@@ -54,13 +53,36 @@ readonly class UserRepository implements UserRepositoryInterface
         }
     }
 
+    /**
+     * @throws RepositoryException
+     */
     public function find(int $id): ?UserMapper
     {
-       return null;
+        try {
+            $entityManager = $this->connection->getEntityManager();
+            return $entityManager->getRepository(UserMapper::class)->find($id);
+        } catch (\Exception $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
     }
 
+    /**
+     * @throws RepositoryException
+     */
     public function delete(int $id): ?array
     {
-        return [];
+        try {
+            $entityManager = $this->connection->getEntityManager();
+            $userId = ['id' => $id];
+            $entityManager->createQueryBuilder()
+                ->delete(UserMapper::class, 'u')
+                ->where('u.id = :id')
+                ->setParameter('id', $id)
+                ->getQuery()
+                ->execute();
+            return $userId;
+        } catch (\Exception $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
     }
 }

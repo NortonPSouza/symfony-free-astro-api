@@ -4,7 +4,10 @@ namespace App\Infra\Ports\Controller\Api;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
+use App\App\UseCase\User\Find\FindUserUseCase;
+use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
+use App\Domain\Exceptions\NotFoundException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Encoder\BcryptPasswordEncoder;
 use App\Infra\Adapters\Repository\UserRepository;
@@ -41,6 +44,19 @@ final class User extends AbstractController
         $input = CreateUserInput::fromArray($request->request->all());
         $passwordEncoder = new BcryptPasswordEncoder();
         $output = $createUserUseCase->execute(input: $input, passwordEncoder: $passwordEncoder);
-        return new JsonResponse($output->jsonSerialize(), $output->getCode());
+        return new JsonResponse($output->getData(), $output->getCode());
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    #[Route('/{userId}', methods: [ 'GET' ])]
+    public function find(Request $request, int $userId): Response
+    {
+        $userRepository = new UserRepository(connection: $this->connection);
+        $findUserUseCase = new FindUserUseCase(userRepository: $userRepository);
+        $input = FindUserInput::fromArray($userId);
+        $output = $findUserUseCase->execute(input: $input);
+        return new JsonResponse($output->getData(), $output->getCode());
     }
 }

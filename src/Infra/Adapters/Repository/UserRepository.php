@@ -69,17 +69,13 @@ readonly class UserRepository implements UserRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    public function delete(int $id): ?array
+    public function delete(UserMapper $user): array
     {
         try {
             $entityManager = $this->connection->getEntityManager();
-            $userId = ['id' => $id];
-            $entityManager->createQueryBuilder()
-                ->delete(UserMapper::class, 'u')
-                ->where('u.id = :id')
-                ->setParameter('id', $id)
-                ->getQuery()
-                ->execute();
+            $userId = ['id' => $user->getId()];
+            $entityManager->remove($user);
+            $entityManager->flush();
             return $userId;
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());

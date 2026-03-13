@@ -1,12 +1,11 @@
 <?php
 
-namespace App\App\UseCase\User\Find\Output;
+namespace App\App\UseCase\User\Delete\Output;
 
 use App\App\UseCase\Shared\GenericOutput;
 
-class FindUserOutput extends GenericOutput
+class DeleteUserOutput extends GenericOutput
 {
-
     public function __construct(
         string $title,
         string $path,
@@ -17,19 +16,19 @@ class FindUserOutput extends GenericOutput
         parent::__construct($title, $path, $data, $code);
     }
 
-    public static function success(array $output): FindUserOutput
+    public static function success(array $output): DeleteUserOutput
     {
-        return new FindUserOutput(
-            'OK',
+        return new DeleteUserOutput(
+            'Deleted',
             '/api/v1/user/{user_id}',
             $output,
             200,
         );
     }
 
-    public static function failure(int $code, array $output): FindUserOutput
+    public static function failure(int $code, array $output): DeleteUserOutput
     {
-        return new FindUserOutput(
+        return new DeleteUserOutput(
             'Error',
             '/api/v1/user/{user_id}',
             $output,

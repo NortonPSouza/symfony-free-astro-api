@@ -5,9 +5,9 @@
 ### 1. Gestão de Usuários
 - [x] **Create** - Cadastro de usuário
   - Nome, sobrenome, data/hora nascimento, signo
-- [ ] **Find** - Buscar usuário por ID
+- [x] **Find** - Buscar usuário por ID
   - Implementar método `find()` no `UserRepository`
-- [ ] **Delete** - Remover usuário
+- [x] **Delete** - Remover usuário
   - Implementar método `delete()` no `UserRepository`
 
 ---

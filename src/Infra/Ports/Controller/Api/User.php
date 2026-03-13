@@ -4,6 +4,8 @@ namespace App\Infra\Ports\Controller\Api;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
+use App\App\UseCase\User\Delete\DeleteUserUseCase;
+use App\App\UseCase\User\Delete\Input\DeleteUserInput;
 use App\App\UseCase\User\Find\FindUserUseCase;
 use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
@@ -51,12 +53,23 @@ final class User extends AbstractController
      * @throws NotFoundException
      */
     #[Route('/{userId}', methods: [ 'GET' ])]
-    public function find(Request $request, int $userId): Response
+    public function find(int $userId): Response
     {
         $userRepository = new UserRepository(connection: $this->connection);
         $findUserUseCase = new FindUserUseCase(userRepository: $userRepository);
         $input = FindUserInput::fromArray($userId);
         $output = $findUserUseCase->execute(input: $input);
+        return new JsonResponse($output->getData(), $output->getCode());
+    }
+
+
+    #[Route('/{userId}', methods: [ 'DELETE' ])]
+    public function delete(int $userId): Response
+    {
+        $userRepository = new UserRepository(connection: $this->connection);
+        $deleteUserUseCase = new DeleteUserUseCase(userRepository: $userRepository);
+        $input = DeleteUserInput::fromArray($userId);
+        $output = $deleteUserUseCase->execute(input: $input);
         return new JsonResponse($output->getData(), $output->getCode());
     }
 }

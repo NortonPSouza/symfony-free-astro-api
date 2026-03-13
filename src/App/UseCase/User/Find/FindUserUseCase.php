@@ -15,7 +15,6 @@ readonly class FindUserUseCase
        private UserRepositoryInterface $userRepository
     )
     {
-
     }
 
     /**

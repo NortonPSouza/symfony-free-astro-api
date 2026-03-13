@@ -25,6 +25,11 @@ interface UserRepositoryInterface
      */
     public function find(int $id): ?UserMapper;
 
-    public function delete(int $id): ?array;
+    /**
+     * @param UserMapper $user
+     * @return array
+     * @throws RepositoryException
+     */
+    public function delete(UserMapper $user): array;
 
 }

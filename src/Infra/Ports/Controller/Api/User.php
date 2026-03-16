@@ -49,9 +49,6 @@ final class User extends AbstractController
         return new JsonResponse($output->getData(), $output->getCode());
     }
 
-    /**
-     * @throws NotFoundException
-     */
     #[Route('/{userId}', methods: [ 'GET' ])]
     public function find(int $userId): Response
     {

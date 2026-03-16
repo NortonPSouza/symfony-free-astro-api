@@ -2,9 +2,12 @@
 
 namespace App\Infra\Adapters\Mappers;
 use Doctrine\ORM\Mapping as ORM;
+use App\Domain\Entity\User as UserDomain;
+use Doctrine\ORM\Mapping\Index;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user')]
+#[Index(name: "email_login_idx", columns: ["email"])]
 class User
 {
     #[ORM\Id]
@@ -14,6 +17,9 @@ class User
 
     #[ORM\Column(name: 'name', type: 'string',  length: 60, nullable: false)]
     private string $name;
+
+    #[ORM\Column(name: 'email', type: 'string', length: 255, unique: true, nullable: false)]
+    private string $email;
 
     #[ORM\Column(name: 'family_name', type: 'string', length: 60, nullable: false)]
     private string $familyName;
@@ -53,6 +59,17 @@ class User
     public function setName(string $name): User
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): User
+    {
+        $this->email = $email;
         return $this;
     }
 
@@ -98,6 +115,20 @@ class User
     {
         $this->zodiac = $zodiac;
         return $this;
+    }
+
+    public function toDomain(): UserDomain
+    {
+        return new UserDomain(
+            $this->getId(),
+            $this->getName(),
+            $this->getFamilyName(),
+            $this->getEmail(),
+            null,
+            $this->getBirthDate(),
+            $this->getBirthTime(),
+            $this->getZodiac()
+        );
     }
 
 }

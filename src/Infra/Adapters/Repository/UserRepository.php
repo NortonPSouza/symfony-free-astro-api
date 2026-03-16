@@ -3,6 +3,7 @@
 namespace App\Infra\Adapters\Repository;
 
 use App\App\Contracts\UserRepositoryInterface;
+use App\Domain\Exceptions\NotFoundException;
 use App\Domain\Exceptions\RepositoryException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Domain\Entity\User;
@@ -30,6 +31,7 @@ readonly class UserRepository implements UserRepositoryInterface
             $userMapper
                 ->setName($user->getName())
                 ->setFamilyName($user->getFamilyName())
+                ->setEmail($user->getEmail())
                 ->setBirthDate($user->getBirthDate())
                 ->setBirthTime($user->getBirthTime())
                 ->setZodiac($user->getZodiac());
@@ -56,11 +58,15 @@ readonly class UserRepository implements UserRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    public function find(int $id): ?UserMapper
+    public function find(int $id): ?User
     {
         try {
             $entityManager = $this->connection->getEntityManager();
-            return $entityManager->getRepository(UserMapper::class)->find($id);
+            $userMapper = $entityManager->getRepository(UserMapper::class)->find($id);
+            if (!$userMapper) {
+                throw new NotFoundException("User not Found");
+            }
+            return $userMapper->toDomain();
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
@@ -69,12 +75,16 @@ readonly class UserRepository implements UserRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    public function delete(UserMapper $user): array
+    public function delete(User $user): array
     {
         try {
             $entityManager = $this->connection->getEntityManager();
-            $userId = ['id' => $user->getId()];
-            $entityManager->remove($user);
+            $userMapper = $entityManager->getRepository(UserMapper::class)->find($user->getId());
+            if (!$userMapper) {
+                throw  new NotFoundException("User not Found");
+            }
+            $userId = ['id' => $userMapper->getId()];
+            $entityManager->remove($userMapper);
             $entityManager->flush();
             return $userId;
         } catch (\Exception $exception) {

@@ -2,9 +2,11 @@
 
 namespace App\Infra\Adapters\Mappers;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'login')]
+#[Index(name: "email_login_idx", columns: ["email"])]
 class Login
 {
     #[ORM\Id]

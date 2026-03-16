@@ -20,11 +20,8 @@ readonly class DeleteUserUseCase
     public function execute(DeleteUserInput $input): DeleteUserOutput
     {
         try {
-            $userMapper = $this->userRepository->find($input->getId());
-            if (!$userMapper) {
-                throw  new NotFoundException("User not Found");
-            }
-            $deleted = $this->userRepository->delete($userMapper);
+            $user = $this->userRepository->find($input->getId());
+            $deleted = $this->userRepository->delete($user);
             return DeleteUserOutput::success($deleted);
         } catch (RepositoryException|NotFoundException $exception) {
             return DeleteUserOutput::failure($exception->getStatusCode(), $exception->getData());

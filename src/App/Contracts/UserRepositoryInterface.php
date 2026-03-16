@@ -3,8 +3,8 @@
 namespace App\App\Contracts;
 
 use App\Domain\Entity\User;
+use App\Domain\Exceptions\NotFoundException;
 use App\Domain\Exceptions\RepositoryException;
-use App\Infra\Adapters\Mappers\User as UserMapper;
 
 interface UserRepositoryInterface
 {
@@ -19,17 +19,18 @@ interface UserRepositoryInterface
 
     /**
      * @throws RepositoryException
+     * @throws NotFoundException
      *
      * @param int $id
-     * @return UserMapper|null
+     * @return User|null
      */
-    public function find(int $id): ?UserMapper;
+    public function find(int $id): ?User;
 
     /**
-     * @param UserMapper $user
+     * @param User $user
      * @return array
      * @throws RepositoryException
      */
-    public function delete(UserMapper $user): array;
+    public function delete(User $user): array;
 
 }

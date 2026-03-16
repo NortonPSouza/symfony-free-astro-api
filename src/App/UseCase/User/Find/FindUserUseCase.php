@@ -17,18 +17,13 @@ readonly class FindUserUseCase
     {
     }
 
-    /**
-     * @throws NotFoundException
-     */
+
     public function execute(FindUserInput $input): FindUserOutput
     {
         try {
-            $userUpdated = $this->userRepository->find($input->getId());
-            if (!$userUpdated) {
-                throw  new NotFoundException("User not Found");
-            }
-            return FindUserOutput::success($userUpdated);
-        } catch (RepositoryException $exception) {
+            $user = $this->userRepository->find($input->getId());
+            return FindUserOutput::success($user);
+        } catch (RepositoryException|NotFoundException $exception) {
            return FindUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }
     }

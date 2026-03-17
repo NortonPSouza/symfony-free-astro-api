@@ -29,20 +29,20 @@ final class User extends AbstractController
         set_exception_handler(null);
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     * @throws InvalidParamsException
-     */
     #[Route('', methods: [ 'POST' ])]
     public function create(Request $request): Response
     {
+        try {
+            $input = CreateUserInput::fromArray($request->request->all());
+        } catch (InvalidParamsException|\DateMalformedStringException $exception) {
+            return new JsonResponse($exception->getData(), $exception->getStatusCode());
+        }
         $userRepository = new UserRepository(connection: $this->connection);
         $zodiacRepository = new ZodiacRepository(connection: $this->connection);
         $createUserUseCase = new CreateUserUseCase(
             userRepository: $userRepository,
             zodiacRepository: $zodiacRepository
         );
-        $input = CreateUserInput::fromArray($request->request->all());
         $passwordEncoder = new BcryptPasswordEncoder();
         $output = $createUserUseCase->execute(input: $input, passwordEncoder: $passwordEncoder);
         return new JsonResponse($output->getData(), $output->getCode());

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\UseCase\User\Create;
+namespace App\App\UseCase\User\Create\Validation;
 
 use App\App\Contracts\ValidationInterface;
 use Respect\Validation\Exceptions\NestedValidationException;

@@ -24,18 +24,20 @@ class Report
     #[ORM\Column(name: 'year', type: 'integer', length: 4, nullable: false)]
     private int $year;
 
-    #[ORM\Column(name: 'status', type: 'string', length: 16, nullable: false)]
-    private int $status;
-
     #[ORM\Column(name: 'requested_at', type: 'date', nullable: false)]
     private \DateTime $requestedAt;
 
-    #[ORM\Column(name: 'completed_at', type: 'date', nullable: false)]
-    private \DateTime $completedAt;
+    #[ORM\Column(name: 'completed_at', type: 'date', nullable: true)]
+    private ?\DateTime $completedAt;
+
+    #[ORM\ManyToOne(targetEntity: ReportStatus::class)]
+    #[ORM\JoinColumn(name: 'status', referencedColumnName: 'id', nullable: false)]
+    private ReportStatus $status;
 
     public function __construct()
     {
         $this->setRequestedAt(new \DateTime());
+        $this->setCompletedAt(null);
     }
 
     public function getProcessId(): string
@@ -82,17 +84,6 @@ class Report
         return $this;
     }
 
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): Report
-    {
-        $this->status = $status;
-        return $this;
-    }
-
     public function getRequestedAt(): \DateTime
     {
         return $this->requestedAt;
@@ -104,14 +95,25 @@ class Report
         return $this;
     }
 
-    public function getCompletedAt(): \DateTime
+    public function getCompletedAt(): ?\DateTime
     {
         return $this->completedAt;
     }
 
-    public function setCompletedAt(\DateTime $completedAt): Report
+    public function setCompletedAt(?\DateTime $completedAt): Report
     {
         $this->completedAt = $completedAt;
+        return $this;
+    }
+
+    public function getStatus(): ReportStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(ReportStatus $status): Report
+    {
+        $this->status = $status;
         return $this;
     }
 

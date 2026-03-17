@@ -2,11 +2,11 @@
 
 namespace App\Infra\Adapters\Repository;
 
-use App\App\Contracts\UserRepositoryInterface;
+use App\App\Contracts\Repository\UserRepositoryInterface;
+use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;
 use App\Domain\Exceptions\RepositoryException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
-use App\Domain\Entity\User;
 use App\Infra\Adapters\Mappers\Login;
 use App\Infra\Adapters\Mappers\LoginUser;
 use App\Infra\Adapters\Mappers\User as UserMapper;

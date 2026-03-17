@@ -2,7 +2,7 @@
 
 namespace App\App\UseCase\User\Find;
 
-use App\App\Contracts\UserRepositoryInterface;
+use App\App\Contracts\Repository\UserRepositoryInterface;
 use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\App\UseCase\User\Find\Output\FindUserOutput;
 use App\Domain\Exceptions\NotFoundException;

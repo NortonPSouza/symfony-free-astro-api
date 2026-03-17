@@ -2,7 +2,7 @@
 
 namespace App\App\UseCase\User\Delete;
 
-use App\App\Contracts\UserRepositoryInterface;
+use App\App\Contracts\Repository\UserRepositoryInterface;
 use App\App\UseCase\User\Delete\Input\DeleteUserInput;
 use App\App\UseCase\User\Delete\Output\DeleteUserOutput;
 use App\Domain\Exceptions\NotFoundException;

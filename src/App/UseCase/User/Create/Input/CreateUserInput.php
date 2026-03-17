@@ -3,7 +3,7 @@
 namespace App\App\UseCase\User\Create\Input;
 
 use App\App\Contracts\ArraySerializationInterface;
-use App\App\UseCase\User\Create\CreateUserValidation;
+use App\App\UseCase\User\Create\Validation\CreateUserValidation;
 use App\Domain\Exceptions\InvalidParamsException;
 
 readonly class CreateUserInput implements ArraySerializationInterface

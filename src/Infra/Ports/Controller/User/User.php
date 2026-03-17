@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Controller\Api;
+namespace App\Infra\Ports\Controller\User;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
@@ -9,15 +9,14 @@ use App\App\UseCase\User\Delete\Input\DeleteUserInput;
 use App\App\UseCase\User\Find\FindUserUseCase;
 use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
-use App\Domain\Exceptions\NotFoundException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Encoder\BcryptPasswordEncoder;
 use App\Infra\Adapters\Repository\UserRepository;
 use App\Infra\Adapters\Repository\ZodiacRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/v1/user')]

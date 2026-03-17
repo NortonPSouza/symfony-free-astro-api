@@ -2,11 +2,10 @@
 
 namespace App\Infra\Adapters\Repository;
 
-use App\App\Contracts\ZodiacRepositoryInterface;
+use App\App\Contracts\Repository\ZodiacRepositoryInterface;
 use App\Domain\Exceptions\RepositoryException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Mappers\Zodiac;
-use Doctrine\DBAL\Exception;
 
 readonly class ZodiacRepository implements ZodiacRepositoryInterface
 {

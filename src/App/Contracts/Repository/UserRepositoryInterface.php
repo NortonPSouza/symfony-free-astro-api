@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\Contracts;
+namespace App\App\Contracts\Repository;
 
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;

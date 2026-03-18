@@ -12,7 +12,7 @@ class Report
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private string $reportId;
+    private string $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
@@ -40,17 +40,16 @@ class Report
         $this->setCompletedAt(null);
     }
 
-    public function getReportId(): string
+    public function getId(): string
     {
-        return $this->reportId;
+        return $this->id;
     }
 
-    public function setReportId(string $reportId): Report
+    public function setId(string $id): Report
     {
-        $this->reportId = $reportId;
+        $this->id = $id;
         return $this;
     }
-
 
     public function getUser(): User
     {

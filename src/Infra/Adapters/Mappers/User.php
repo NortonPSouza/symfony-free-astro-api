@@ -11,9 +11,10 @@ use Doctrine\ORM\Mapping\Index;
 class User
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'id', type: 'integer', length: 8)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private int $id;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private string $id;
 
     #[ORM\Column(name: 'name', type: 'string',  length: 60, nullable: false)]
     private string $name;
@@ -40,12 +41,12 @@ class User
         $this->setZodiac(null);
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function setId(int $id): User
+    public function setId(string $id): User
     {
         $this->id = $id;
         return $this;

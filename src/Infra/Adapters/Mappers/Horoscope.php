@@ -8,9 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Horoscope
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'id', type: 'integer', length: 8)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private int $id;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private string $id;
 
     #[ORM\Column(name: 'start_date', type: 'date', nullable: false)]
     private \DateTime $startDate;
@@ -25,13 +26,12 @@ class Horoscope
     #[ORM\JoinColumn(name: 'zodiac_id', referencedColumnName: 'id', nullable: false)]
     private Zodiac $zodiac;
 
-
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function setId(int $id): Horoscope
+    public function setId(string $id): Horoscope
     {
         $this->id = $id;
         return $this;

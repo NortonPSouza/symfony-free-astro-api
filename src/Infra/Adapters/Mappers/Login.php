@@ -10,22 +10,22 @@ use Doctrine\ORM\Mapping\Index;
 class Login
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'id', type: 'integer', length: 8)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private int $id;
-
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private string $id;
     #[ORM\Column(name: 'email', type: 'string', length: 255, unique: true, nullable: false)]
     private string $email;
 
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: false)]
     private string $password;
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function setId(int $id): Login
+    public function setId(string $id): Login
     {
         $this->id = $id;
         return $this;

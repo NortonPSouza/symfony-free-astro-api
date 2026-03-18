@@ -8,13 +8,10 @@ RUN apt update && apt install -y \
     librabbitmq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP Extensions (Symfony requirements)
-RUN docker-php-ext-install \
-    zip sockets pdo pdo_mysql intl
 #  Install MySQL
 RUN docker-php-ext-install pdo &&  \
     docker-php-ext-install pdo_mysql &&  \
-    docker-php-ext-enable pdo_mysql \
+    docker-php-ext-enable pdo_mysql
 # Install AMQP (RabbitMQ)
 RUN pecl install amqp && docker-php-ext-enable amqp
 # Install Composer

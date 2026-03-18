@@ -89,6 +89,7 @@ class User implements ArraySerializationInterface
     public function toArray(): array
     {
         return [
+            "id" => $this->getId(),
             "name" => $this->getName(),
             "family_name" => $this->getFamilyName(),
             "birth_date" => $this->getBirthDate(),

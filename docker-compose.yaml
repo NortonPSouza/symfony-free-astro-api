@@ -3,6 +3,7 @@ services:
         build: ./local
         image: php:public
         container_name: astro
+        command: ./local/symfony.sh
         volumes:
             - ./:/var/www/html
         ports:

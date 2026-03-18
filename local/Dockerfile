@@ -8,14 +8,16 @@ RUN apt update && apt install -y \
     librabbitmq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-#  Install MySQL
-RUN docker-php-ext-install pdo &&  \
-    docker-php-ext-install pdo_mysql &&  \
-    docker-php-ext-enable pdo_mysql
+# Install PHP Extensions
+RUN docker-php-ext-install pdo pdo_mysql sockets
+
 # Install AMQP (RabbitMQ)
 RUN pecl install amqp && docker-php-ext-enable amqp
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Fix git ownership (diff user in volume container)
+RUN git config --global --add safe.directory /var/www/html
 
 # Set working directory
 WORKDIR /var/www/html

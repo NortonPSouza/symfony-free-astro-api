@@ -24,7 +24,7 @@ readonly class ReportRepository implements ReportRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    public function create(Report $report): array
+    public function create(Report $report): Report
     {
         try {
             $entityManager = $this->connection->getEntityManager();
@@ -42,7 +42,8 @@ readonly class ReportRepository implements ReportRepositoryInterface
                 ->setStatus($reportStatusMapper);
             $entityManager->persist($reportMapper);
             $entityManager->flush();
-            return ['id' => $reportMapper->getProcessId()];
+            $report->setProcessId($reportMapper->getReportId());
+            return $report;
         } catch (ORMException|NotFoundException $exception) {
             throw new RepositoryException($exception->getMessage());
         }

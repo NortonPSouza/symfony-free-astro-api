@@ -11,9 +11,10 @@ interface ReportRepositoryInterface
 
     /**
      * @param Report $report
-     * @return array
-     * @throws ORMException|NotFoundException
+     * @return Report
+     * @throws ORMException
+     * @throws NotFoundException
      */
-    public function create(Report $report): array;
+    public function create(Report $report): Report;
 
 }

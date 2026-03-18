@@ -13,7 +13,8 @@ class Report
         private int $userId,
         private int $month,
         private int $year,
-        private int $status
+        private int $status,
+        private ?string $processId
     )
     {
     }
@@ -24,7 +25,8 @@ class Report
             $input->getUserId(),
             $input->getMonth(),
             $input->getYear(),
-            ReportStatus::PENDING->getStatus()
+            ReportStatus::PENDING->getStatus(),
+            null
         );
     }
 
@@ -46,6 +48,17 @@ class Report
     public function getStatus(): int
     {
         return $this->status;
+    }
+
+    public function getProcessId(): ?string
+    {
+        return $this->processId;
+    }
+
+    public function setProcessId(?string $processId): Report
+    {
+        $this->processId = $processId;
+        return $this;
     }
 
 }

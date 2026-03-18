@@ -2,7 +2,7 @@
 
 namespace App\Infra\Adapters\Encoder;
 
-use App\App\Contracts\PasswordEncoderInterface;
+use App\App\Contracts\Validation\PasswordEncoderInterface;
 
 final class BcryptPasswordEncoder implements PasswordEncoderInterface
 {

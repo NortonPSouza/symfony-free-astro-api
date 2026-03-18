@@ -2,7 +2,7 @@
 
 namespace App\App\UseCase\Report\Create\Validation;
 
-use App\App\Contracts\ValidationInterface;
+use App\App\Contracts\Validation\ValidationInterface;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator as v;
 

@@ -2,7 +2,7 @@
 
 namespace App\App\UseCase\User\Create\Input;
 
-use App\App\Contracts\ArraySerializationInterface;
+use App\App\Contracts\Validation\ArraySerializationInterface;
 use App\App\UseCase\User\Create\Validation\CreateUserValidation;
 use App\Domain\Exceptions\InvalidParamsException;
 

@@ -5,6 +5,7 @@ FROM php:${PHP_VERSION}-cli
 RUN apt update && apt install -y \
     zip curl libzip-dev libssl-dev \
     git unzip libicu-dev \
+    librabbitmq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP Extensions (Symfony requirements)
@@ -13,8 +14,9 @@ RUN docker-php-ext-install \
 #  Install MySQL
 RUN docker-php-ext-install pdo &&  \
     docker-php-ext-install pdo_mysql &&  \
-    docker-php-ext-enable pdo_mysql
-
+    docker-php-ext-enable pdo_mysql \
+# Install AMQP (RabbitMQ)
+RUN pecl install amqp && docker-php-ext-enable amqp
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

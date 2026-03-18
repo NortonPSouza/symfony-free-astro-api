@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Controller\User;
+namespace App\Infra\Ports\Http\Controller\User;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+// TODO: remove God class, separate controllers for each method
 #[Route('/api/v1/user')]
 final class User extends AbstractController
 {

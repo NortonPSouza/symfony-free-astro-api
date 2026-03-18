@@ -21,6 +21,17 @@ services:
             - "3306:3306"
         volumes:
             - db_data:/var/lib/mysql
-
+    rabbitmq:
+        image: rabbitmq:4.2-alpine
+        container_name: astro_rabbitmq
+        environment:
+            RABBITMQ_DEFAULT_USER: astro_user
+            RABBITMQ_DEFAULT_PASS: astro_password
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
 volumes:
     db_data:
+    rabbitmq_data:

@@ -2,8 +2,8 @@
 
 namespace App\Domain\Entity;
 
-use App\App\Contracts\ArraySerializationInterface;
-use App\App\Contracts\PasswordEncoderInterface;
+use App\App\Contracts\Validation\ArraySerializationInterface;
+use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
 
 class User implements ArraySerializationInterface

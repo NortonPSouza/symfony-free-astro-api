@@ -23,7 +23,7 @@ services:
         volumes:
             - db_data:/var/lib/mysql
     rabbitmq:
-        image: rabbitmq:4.2-alpine
+        image: rabbitmq:4.2-management
         container_name: astro_rabbitmq
         environment:
             RABBITMQ_DEFAULT_USER: astro_user

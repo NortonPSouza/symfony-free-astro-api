@@ -61,7 +61,7 @@ readonly class UserRepository implements UserRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    public function find(int $id): ?User
+    public function find(string $id): ?User
     {
         try {
             $entityManager = $this->connection->getEntityManager();
@@ -84,7 +84,7 @@ readonly class UserRepository implements UserRepositoryInterface
             $entityManager = $this->connection->getEntityManager();
             $userMapper = $entityManager->getRepository(UserMapper::class)->find($user->getId());
             if (!$userMapper) {
-                throw  new NotFoundException("User not Found");
+                throw new NotFoundException("User not Found");
             }
             $userId = ['id' => $userMapper->getId()];
             $entityManager->remove($userMapper);

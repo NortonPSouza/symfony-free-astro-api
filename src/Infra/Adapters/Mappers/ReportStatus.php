@@ -13,5 +13,16 @@ class ReportStatus
     private int $id;
 
     #[ORM\Column(name: 'description', type: 'string', length: 16, nullable: false)]
-    private int $description;
+    private string $description;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
 }

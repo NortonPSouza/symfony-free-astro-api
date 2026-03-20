@@ -42,7 +42,8 @@ readonly class ReportRepository implements ReportRepositoryInterface
                 ->setStatus($reportStatusMapper);
             $entityManager->persist($reportMapper);
             $entityManager->flush();
-            $report->setProcessId($reportMapper->getReportId());
+            $report->setProcessId($reportMapper->getId())
+                ->setRequestedAt($reportMapper->getRequestedAt());
             return $report;
         } catch (ORMException|NotFoundException $exception) {
             throw new RepositoryException($exception->getMessage());

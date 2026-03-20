@@ -22,11 +22,13 @@ abstract class RabbitQueue
             password: $_ENV['AMQP_PASSWORD']
         );
         $channel = $connection->channel();
-        $channel->queue_declare($queue, auto_delete: false);
+        $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
+        $channel->queue_declare($queue, durable: true, auto_delete: false);
+        $channel->queue_bind($queue, $queue, $routeKey);
         $amqpMessage = new AMQPMessage($message, [
+            'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
             'application_headers' => new AMQPTable($header),
         ]);
-        // TODO: search about field exchange
         $channel->basic_publish($amqpMessage, exchange: $queue, routing_key: $routeKey);
         $channel->close();
         $connection->close();

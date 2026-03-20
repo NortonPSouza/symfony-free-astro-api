@@ -14,7 +14,7 @@ class CreateReportValidation implements ValidationInterface
     public static function validate(array $inputRequest): void
     {
         $validator = v::create()
-            ->key('user_id', v::intType()->notEmpty()->setName('user_id'))
+            ->key('user_id', v::notEmpty()->stringType()->setName('user_id'))
             ->key('month', v::notEmpty()->intVal()->between(1, 12)->setName('month'))
             ->key('year', v::notEmpty()->digit()->length(4, 4)->setName('year'));
         try {

@@ -84,7 +84,7 @@ INSERT INTO zodiac (id, sign, start_date, end_date) VALUES
 Based on `Domain/Types/ReportStatus.php`:
 
 ```sql
-INSERT INTO report_status (id, status) VALUES
+INSERT INTO report_status (id, description) VALUES
 (1, 'PENDING'),
 (2, 'PROCESSING'),
 (3, 'COMPLETED'),

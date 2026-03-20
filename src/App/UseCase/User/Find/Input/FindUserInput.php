@@ -6,17 +6,17 @@ namespace App\App\UseCase\User\Find\Input;
 {
 
     public function __construct(
-        private int $id
+        private string $id
     )
     {
     }
 
-     static public function fromArray(int $userId): FindUserInput
+     static public function fromArray(string $userId): FindUserInput
     {
       return new FindUserInput($userId);
     }
 
-     public function getId(): int
+     public function getId(): string
      {
          return $this->id;
      }

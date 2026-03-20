@@ -13,7 +13,15 @@ class EventProcessReport extends RabbitQueue implements EventProcessReportInterf
     public function execute(Report $report): void
     {
         try {
-            $payload = [];
+            $payload = [
+                "process_id" => $report->getProcessId(),
+                "user_id" => $report->getUserId(),
+                "month" => $report->getMonth(),
+                "year" => $report->getYear(),
+                "status" => $report->getStatus(),
+                "requested_at" => $report->getRequestedAt()->format('Y-m-d\TH:i:sP'),
+                "completed_at" => null
+            ];
             $this->sender(
                 message: json_encode($payload),
                 queue: "process_report",

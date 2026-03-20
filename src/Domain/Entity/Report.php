@@ -10,11 +10,12 @@ class Report
 {
 
     public function __construct(
-        private int $userId,
-        private int $month,
-        private int $year,
-        private int $status,
-        private ?string $processId
+        private readonly string $userId,
+        private readonly int $month,
+        private readonly int $year,
+        private readonly int $status,
+        private ?string $processId,
+        private ?\DateTime $requestedAt
     )
     {
     }
@@ -26,11 +27,12 @@ class Report
             $input->getMonth(),
             $input->getYear(),
             ReportStatus::PENDING->getStatus(),
+            null,
             null
         );
     }
 
-    public function getUserId(): int
+    public function getUserId(): string
     {
         return $this->userId;
     }
@@ -58,6 +60,17 @@ class Report
     public function setProcessId(?string $processId): Report
     {
         $this->processId = $processId;
+        return $this;
+    }
+
+    public function getRequestedAt(): ?\dateTime
+    {
+        return $this->requestedAt;
+    }
+
+    public function setRequestedAt(?\dateTime $requestedAt): Report
+    {
+        $this->requestedAt = $requestedAt;
         return $this;
     }
 

@@ -24,7 +24,7 @@ interface UserRepositoryInterface
      * @param int $id
      * @return User|null
      */
-    public function find(int $id): ?User;
+    public function find(string $id): ?User;
 
     /**
      * @param User $user

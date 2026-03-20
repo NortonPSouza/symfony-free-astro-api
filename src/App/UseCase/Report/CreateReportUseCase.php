@@ -29,7 +29,7 @@ readonly class CreateReportUseCase
             $this->eventProcessReport->execute($created);
             return CreateReportOutput::success(['id' => $created->getProcessId()]);
         } catch (ORMException|NotFoundException|EventException $exception) {
-            return CreateReportOutput::failure($exception->getCode(), $exception->getData());
+            return CreateReportOutput::failure($exception->getStatusCode(), $exception->getData());
         }
     }
 }

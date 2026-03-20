@@ -52,7 +52,7 @@ final class User extends AbstractController
     }
 
     #[Route('/{userId}', methods: [ 'GET' ])]
-    public function find(int $userId): Response
+    public function find(string $userId): Response
     {
         $userRepository = new UserRepository(connection: $this->connection);
         $findUserUseCase = new FindUserUseCase(userRepository: $userRepository);
@@ -63,7 +63,7 @@ final class User extends AbstractController
 
 
     #[Route('/{userId}', methods: [ 'DELETE' ])]
-    public function delete(int $userId): Response
+    public function delete(string $userId): Response
     {
         $userRepository = new UserRepository(connection: $this->connection);
         $deleteUserUseCase = new DeleteUserUseCase(userRepository: $userRepository);

@@ -13,7 +13,7 @@ readonly class CreateReportInput implements ArraySerializationInterface
      * @throws InvalidParamsException
      */
     public function __construct(
-        private int $userId,
+        private string $userId,
         private int $month,
         private int $year,
     )
@@ -31,13 +31,13 @@ readonly class CreateReportInput implements ArraySerializationInterface
     static function fromArray(array $inputRequest): CreateReportInput
     {
         return new CreateReportInput(
-            (int) $inputRequest['user_id'],
+            (string) $inputRequest['user_id'],
             (int) $inputRequest['month'],
             (int) $inputRequest['year'],
         );
     }
 
-    public function getUserId(): int
+    public function getUserId(): string
     {
         return $this->userId;
     }

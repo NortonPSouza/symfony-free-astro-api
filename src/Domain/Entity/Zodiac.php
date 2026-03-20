@@ -6,18 +6,18 @@ class Zodiac
 {
 
     public function __construct(
-        private int $id,
+        private string $id,
         private string $sign
     )
     {
     }
 
-    static function create(int $id, string $sign): Zodiac
+    static function create(string $id, string $sign): Zodiac
     {
         return new Zodiac($id, $sign);
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

@@ -10,7 +10,7 @@ class User implements ArraySerializationInterface
 {
 
     public function __construct(
-        private ?int $id,
+        private ?string $id,
         private string $name,
         private string $familyName,
         private string $email,
@@ -46,7 +46,7 @@ class User implements ArraySerializationInterface
         $this->password = $passwordEncoder->encode($this->password);
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }

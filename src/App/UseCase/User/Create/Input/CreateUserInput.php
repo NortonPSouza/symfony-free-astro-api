@@ -13,11 +13,11 @@ readonly class CreateUserInput implements ArraySerializationInterface
      * @throws InvalidParamsException
      */
     public function __construct(
-        private string $name,
-        private string $familyName,
-        private string $password,
-        private string $email,
-        private \DateTime $birthDate,
+        private ?string $name,
+        private ?string $familyName,
+        private ?string $password,
+        private ?string $email,
+        private ?\DateTime $birthDate,
         private ?\DateTime $birthTime,
     )
     {
@@ -34,12 +34,12 @@ readonly class CreateUserInput implements ArraySerializationInterface
     static function fromArray(array $inputRequest): CreateUserInput
     {
         return new CreateUserInput(
-            $inputRequest['name'],
-            $inputRequest['familyName'],
-            $inputRequest['password'],
-            $inputRequest['email'],
-            new \DateTime($inputRequest['birthDate']),
-            new \DateTime($inputRequest['birthTime']) ?? null
+        $inputRequest['name'] ?? null,
+    $inputRequest['family_name'] ?? null,
+     $inputRequest['password'] ?? null,
+        $inputRequest['email'] ?? null,
+    !empty($inputRequest['birth_date']) ? new \DateTime($inputRequest['birth_date']) : null,
+    isset($inputRequest['birth_time']) ? new \DateTime($inputRequest['birth_time']) : null
         );
     }
 
@@ -68,7 +68,7 @@ readonly class CreateUserInput implements ArraySerializationInterface
         return $this->birthDate;
     }
 
-    public function getBirthTime(): \DateTime
+    public function getBirthTime(): ?\DateTime
     {
         return $this->birthTime;
     }

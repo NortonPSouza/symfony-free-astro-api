@@ -39,3 +39,54 @@ It helps to apply:
 ```bash
 git clone https://github.com/yourusername/FreeAstroAPI.git
 cd FreeAstroAPI
+```
+
+## ⚙️ Project Setup
+
+### 1. Start Docker
+
+```bash
+docker compose up --build
+```
+
+### 2. Run Migrations
+
+```bash
+docker exec -it astro php bin/console doctrine:migrations:migrate
+```
+
+### 3. Seed Required Data
+
+After running migrations, insert the required seed data below.
+
+#### 🔮 Zodiac Signs
+
+```sql
+INSERT INTO zodiac (id, sign, start_date, end_date) VALUES
+(UUID_TO_BIN(UUID()), 'Aries',       '2000-03-21', '2000-04-19'),
+(UUID_TO_BIN(UUID()), 'Taurus',      '2000-04-20', '2000-05-20'),
+(UUID_TO_BIN(UUID()), 'Gemini',      '2000-05-21', '2000-06-20'),
+(UUID_TO_BIN(UUID()), 'Cancer',      '2000-06-21', '2000-07-22'),
+(UUID_TO_BIN(UUID()), 'Leo',         '2000-07-23', '2000-08-22'),
+(UUID_TO_BIN(UUID()), 'Virgo',       '2000-08-23', '2000-09-22'),
+(UUID_TO_BIN(UUID()), 'Libra',       '2000-09-23', '2000-10-22'),
+(UUID_TO_BIN(UUID()), 'Scorpio',     '2000-10-23', '2000-11-21'),
+(UUID_TO_BIN(UUID()), 'Sagittarius', '2000-11-22', '2000-12-21'),
+(UUID_TO_BIN(UUID()), 'Capricorn',   '2000-12-22', '2000-01-19'),
+(UUID_TO_BIN(UUID()), 'Aquarius',    '2000-01-20', '2000-02-18'),
+(UUID_TO_BIN(UUID()), 'Pisces',      '2000-02-19', '2000-03-20');
+```
+
+> The year used in dates is irrelevant — only the month and day are used to determine the zodiac sign.
+
+#### 📊 Report Status
+
+Based on `Domain/Types/ReportStatus.php`:
+
+```sql
+INSERT INTO report_status (id, status) VALUES
+(1, 'PENDING'),
+(2, 'PROCESSING'),
+(3, 'COMPLETED'),
+(4, 'FAILURE');
+```

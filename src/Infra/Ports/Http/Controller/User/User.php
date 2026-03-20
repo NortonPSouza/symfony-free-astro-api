@@ -35,8 +35,10 @@ final class User extends AbstractController
     {
         try {
             $input = CreateUserInput::fromArray($request->request->all());
-        } catch (InvalidParamsException|\DateMalformedStringException $exception) {
+        } catch (InvalidParamsException $exception) {
             return new JsonResponse($exception->getData(), $exception->getStatusCode());
+        } catch (\DateMalformedStringException $exception) {
+            return new JsonResponse($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
         $userRepository = new UserRepository(connection: $this->connection);
         $zodiacRepository = new ZodiacRepository(connection: $this->connection);

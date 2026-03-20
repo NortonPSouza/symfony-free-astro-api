@@ -23,7 +23,7 @@ readonly class ZodiacRepository implements ZodiacRepositoryInterface
     {
         try {
             $entityManager = $this->connection->getEntityManager();
-            $monthDay = $birth->format('m-d');
+            $monthDay = '2000-' . $birth->format('m-d');
             $queryBuilder = $entityManager->createQueryBuilder();
             return $queryBuilder->select('z')
                 ->from(Zodiac::class, 'z')

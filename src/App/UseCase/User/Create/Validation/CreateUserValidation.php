@@ -15,8 +15,10 @@ class CreateUserValidation implements ValidationInterface
     {
         $validator = v::create()
             ->key('name', v::stringType()->notEmpty()->setName('name'))
-            ->key('familyName', v::stringType()->notEmpty()->setName('familyName'))
-            ->key('birthDate', v::dateTime()->notEmpty()->setName('birthDate'));
+            ->key('family_name', v::stringType()->notEmpty()->setName('family_name'))
+            ->key('birth_date', v::dateTime()->notEmpty()->setName('birth_date'))
+            ->key('password', v::stringType()->notEmpty()->setName('password'))
+            ->key('email', v::email()->notEmpty()->setName('email'));
         try {
             $validator->assert($inputRequest);
         } catch (NestedValidationException $exception) {

@@ -10,6 +10,8 @@ use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Mappers\Login;
 use App\Infra\Adapters\Mappers\LoginUser;
 use App\Infra\Adapters\Mappers\User as UserMapper;
+use App\Infra\Adapters\Mappers\Zodiac;
+use Doctrine\ORM\Exception\ORMException;
 
 readonly class UserRepository implements UserRepositoryInterface
 {
@@ -21,12 +23,13 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @throws RepositoryException
+     * @throws RepositoryException|ORMException
      */
     public function create(User $user): array
     {
         try {
             $entityManager = $this->connection->getEntityManager();
+            $zodiacMapper = $entityManager->getReference(Zodiac::class, $user->getZodiac()->getId());
             $userMapper = new UserMapper();
             $userMapper
                 ->setName($user->getName())
@@ -34,7 +37,7 @@ readonly class UserRepository implements UserRepositoryInterface
                 ->setEmail($user->getEmail())
                 ->setBirthDate($user->getBirthDate())
                 ->setBirthTime($user->getBirthTime())
-                ->setZodiac($user->getZodiac());
+                ->setZodiac($zodiacMapper);
             $entityManager->persist($userMapper);
             $loginMapper = new Login();
             $loginMapper

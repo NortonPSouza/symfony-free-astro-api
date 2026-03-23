@@ -5,6 +5,7 @@ namespace App\Infra\Adapters\Repository;
 use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\Domain\Entity\Report;
 use App\Domain\Exceptions\NotFoundException;
+use App\Domain\Types\ReportStatus as ReportStatusType;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Mappers\Report as ReportMapper;
 use App\Domain\Exceptions\RepositoryException;
@@ -46,6 +47,26 @@ readonly class ReportRepository implements ReportRepositoryInterface
                 ->setRequestedAt($reportMapper->getRequestedAt());
             return $report;
         } catch (ORMException|NotFoundException $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
+    }
+
+
+    public function updateStatus(string $reportId, ReportStatusType $status): Report
+    {
+        try {
+            $entityManager = $this->connection->getEntityManager();
+            $reportStatusMapper = $entityManager->getReference(ReportStatus::class, $status->getStatus());
+            $reportMapper = $entityManager->getRepository(ReportMapper::class)->find($reportId);
+            $reportMapper
+                ->setStatus($reportStatusMapper);
+            if ($status === ReportStatusType::COMPLETED) {
+                $reportMapper->setCompletedAt(new \DateTime());
+            }
+            $entityManager->persist($reportMapper);
+            $entityManager->flush();
+            return $reportMapper->toDomain();
+        } catch (ORMException $exception) {
             throw new RepositoryException($exception->getMessage());
         }
     }

@@ -24,8 +24,8 @@ class EventProcessReport extends RabbitQueue implements EventProcessReportInterf
             ];
             $this->sender(
                 message: json_encode($payload),
-                queue: "process_report",
-                routeKey: "process_report",
+                queue: "horoscope.monthly.report",
+                routeKey: "horoscope.monthly.report",
                 header: ['x-queue-type' => 'quorum']
             );
         } catch (\Exception $exception) {

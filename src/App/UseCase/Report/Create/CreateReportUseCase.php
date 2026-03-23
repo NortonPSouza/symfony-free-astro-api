@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\UseCase\Report;
+namespace App\App\UseCase\Report\Create;
 
 use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;

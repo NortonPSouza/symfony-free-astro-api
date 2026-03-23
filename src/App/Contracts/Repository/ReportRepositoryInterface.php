@@ -4,6 +4,8 @@ namespace App\App\Contracts\Repository;
 
 use App\Domain\Entity\Report;
 use App\Domain\Exceptions\NotFoundException;
+use App\Domain\Exceptions\RepositoryException;
+use App\Domain\Types\ReportStatus;
 use Doctrine\ORM\Exception\ORMException;
 
 interface ReportRepositoryInterface
@@ -17,4 +19,11 @@ interface ReportRepositoryInterface
      */
     public function create(Report $report): Report;
 
+    /**
+     * @param string $reportId
+     * @param ReportStatus $status
+     * @return Report
+     * @throws RepositoryException
+     */
+    public function updateStatus(string $reportId, ReportStatus $status): Report;
 }

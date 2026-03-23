@@ -46,30 +46,6 @@
   - Gerar previsões mensais
   - Compilar relatório em JSON/PDF
 
----
-
-## 🔧 Tarefas Técnicas
-
-### Banco de Dados
-- [ ] Migration: criar tabela `users` (se não existe)
-- [ ] Configurar MongoDB para logs
-- [ ] Índices no MongoDB para performance
-
-### Mensageria
-- [ ] Instalar RabbitMQ (Docker)
-- [ ] Configurar exchanges e queues
-- [ ] Criar worker para consumir fila
-
-### Testes
-- [ ] Unit tests: UserRepository (find, delete)
-- [ ] Unit tests: MonthlyReportUseCase
-- [ ] Integration tests: Fila + MongoDB
-- [ ] E2E tests: Fluxo completo do relatório
-
-### Documentação
-- [ ] Swagger: documentar novos endpoints
-- [ ] README: instruções de setup RabbitMQ + MongoDB
-- [ ] Diagramas: fluxo da fila de relatórios
 
 ---
 

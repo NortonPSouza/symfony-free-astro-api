@@ -9,18 +9,25 @@ use PhpAmqpLib\Wire\AMQPTable;
 abstract class RabbitQueue
 {
 
+    /**
+     * @throws \Exception
+     */
+    private function connection(): AMQPStreamConnection
+    {
+        return new AMQPStreamConnection(
+            host: $_ENV['AMQP_HOST'],
+            port: $_ENV['AMQP_PORT'],
+            user: $_ENV['AMQP_USERNAME'],
+            password: $_ENV['AMQP_PASSWORD']
+        );
+    }
 
     /**
      * @throws \Exception
      */
     protected function sender(string $message, string $queue, string $routeKey, array $header): void
     {
-        $connection = new AMQPStreamConnection(
-            host: $_ENV['AMQP_HOST'],
-            port: $_ENV['AMQP_PORT'],
-            user: $_ENV['AMQP_USERNAME'],
-            password: $_ENV['AMQP_PASSWORD']
-        );
+        $connection = $this->connection();
         $channel = $connection->channel();
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
         $channel->queue_declare($queue, durable: true, auto_delete: false);
@@ -32,5 +39,28 @@ abstract class RabbitQueue
         $channel->basic_publish($amqpMessage, exchange: $queue, routing_key: $routeKey);
         $channel->close();
         $connection->close();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function receiver(string $queue, callable $callback): void
+    {
+        $connection = $this->connection();
+        $channel = $connection->channel();
+        $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
+        $channel->queue_declare($queue, durable: true, auto_delete: false);
+        $channel->queue_bind($queue, $queue, $queue);
+        $channel->basic_consume(
+            queue: $queue,
+            callback: function (AMQPMessage $message) use ($callback) {
+                $payload = json_decode($message->getBody(), true);
+                $callback($payload);
+                $message->ack();
+            }
+        );
+        while ($channel->is_consuming()) {
+            $channel->wait();
+        }
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Infra\Adapters\Mappers;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Domain\Entity\Report as ReportDomain;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'report')]
 class Report
 {
-
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -117,4 +117,15 @@ class Report
         return $this;
     }
 
+    public function toDomain(): ReportDomain
+    {
+        return new ReportDomain(
+            $this->getUser()->getId(),
+            $this->getMonth(),
+            $this->getYear(),
+            $this->getStatus()->getId(),
+            $this->getId(),
+            $this->getRequestedAt(),
+        );
+    }
 }

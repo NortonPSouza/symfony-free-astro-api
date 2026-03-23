@@ -2,8 +2,8 @@
 
 namespace App\Infra\Ports\Http\Controller\Report;
 
+use App\App\UseCase\Report\Create\CreateReportUseCase;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;
-use App\App\UseCase\Report\CreateReportUseCase;
 use App\Domain\Exceptions\InvalidParamsException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Gateway\EventProcessReport;

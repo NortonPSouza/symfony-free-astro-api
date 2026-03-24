@@ -33,6 +33,18 @@ services:
             - "15672:15672"
         volumes:
             - rabbitmq_data:/var/lib/rabbitmq
+    mongodb:
+        image: mongo:8.0.21-rc0-noble
+        container_name: astro_mongodb
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: astro_user
+            MONGO_INITDB_ROOT_PASSWORD: astro_password
+            MONGO_INITDB_DATABASE: free_astro
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongodb_data:/data/db
 volumes:
     db_data:
     rabbitmq_data:
+    mongodb_data:

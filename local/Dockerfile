@@ -6,6 +6,7 @@ RUN apt update && apt install -y \
     zip curl libzip-dev libssl-dev \
     git unzip libicu-dev \
     librabbitmq-dev \
+    libssl-dev pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP Extensions
@@ -13,6 +14,10 @@ RUN docker-php-ext-install pdo pdo_mysql sockets
 
 # Install AMQP (RabbitMQ)
 RUN pecl install amqp && docker-php-ext-enable amqp
+
+# Install MongoDB extension
+RUN pecl install mongodb && docker-php-ext-enable mongodb
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

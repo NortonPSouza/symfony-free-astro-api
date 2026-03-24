@@ -4,10 +4,6 @@ namespace App\Infra\Ports\Http\Controller\User;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
-use App\App\UseCase\User\Delete\DeleteUserUseCase;
-use App\App\UseCase\User\Delete\Input\DeleteUserInput;
-use App\App\UseCase\User\Find\FindUserUseCase;
-use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Adapters\Encoder\BcryptPasswordEncoder;
@@ -19,9 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-// TODO: remove God class, separate controllers for each method
 #[Route('/api/v1/user')]
-final class User extends AbstractController
+final class Create extends AbstractController
 {
     public function __construct(
         private readonly ConnectionDoctrine $connection,
@@ -48,27 +43,6 @@ final class User extends AbstractController
         );
         $passwordEncoder = new BcryptPasswordEncoder();
         $output = $createUserUseCase->execute(input: $input, passwordEncoder: $passwordEncoder);
-        return new JsonResponse($output->getData(), $output->getCode());
-    }
-
-    #[Route('/{userId}', methods: [ 'GET' ])]
-    public function find(string $userId): Response
-    {
-        $userRepository = new UserRepository(connection: $this->connection);
-        $findUserUseCase = new FindUserUseCase(userRepository: $userRepository);
-        $input = FindUserInput::fromArray($userId);
-        $output = $findUserUseCase->execute(input: $input);
-        return new JsonResponse($output->getData(), $output->getCode());
-    }
-
-
-    #[Route('/{userId}', methods: [ 'DELETE' ])]
-    public function delete(string $userId): Response
-    {
-        $userRepository = new UserRepository(connection: $this->connection);
-        $deleteUserUseCase = new DeleteUserUseCase(userRepository: $userRepository);
-        $input = DeleteUserInput::fromArray($userId);
-        $output = $deleteUserUseCase->execute(input: $input);
         return new JsonResponse($output->getData(), $output->getCode());
     }
 }

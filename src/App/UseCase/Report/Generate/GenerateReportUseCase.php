@@ -25,9 +25,9 @@ readonly class GenerateReportUseCase
             $this->reportRepository->updateStatus($input->getProcessId(), ReportStatus::COMPLETED);
             sleep(10);
             // TODO: insert mongo log
-            return new GenerateReportOutput();
-        } catch (RepositoryException) {
-            return new GenerateReportOutput();
+            return GenerateReportOutput::success([]);
+        } catch (RepositoryException $exception) {
+            return GenerateReportOutput::failure($exception->getStatusCode(), $exception->getData());
         }
     }
 }

@@ -8,4 +8,5 @@ interface ConnectionInterface
     public function commit(): void;
     public function rollback(): void;
     public function flush(): void;
+    public function clear(): void;
 }

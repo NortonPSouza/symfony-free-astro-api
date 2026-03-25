@@ -9,7 +9,7 @@ readonly class JsonFortuneProvider implements FortuneProviderInterface
 
     public function getRandomFortune(): string
     {
-        $path = __DIR__ .'./local/fortune-message.json' ;
+        $path = __DIR__ . '/../../../../local/fortune-message.json';
         $data = json_decode(file_get_contents($path), true);
         return $data[array_rand($data)];
     }

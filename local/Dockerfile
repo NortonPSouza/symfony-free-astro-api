@@ -7,10 +7,12 @@ RUN apt update && apt install -y \
     git unzip libicu-dev \
     librabbitmq-dev \
     libssl-dev pkg-config \
+    libpng-dev libjpeg-dev libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP Extensions
-RUN docker-php-ext-install pdo pdo_mysql sockets
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql sockets gd
 
 # Install AMQP (RabbitMQ)
 RUN pecl install amqp && docker-php-ext-enable amqp

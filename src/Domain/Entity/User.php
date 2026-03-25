@@ -14,7 +14,7 @@ class User implements ArraySerializationInterface
         private string $name,
         private string $familyName,
         private string $email,
-        private string $password,
+        private ?string $password,
         private \DateTime $birthDate,
         private ?\DateTime $birthTime,
         private ?Zodiac $zodiac
@@ -66,7 +66,7 @@ class User implements ArraySerializationInterface
         return $this->email;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }

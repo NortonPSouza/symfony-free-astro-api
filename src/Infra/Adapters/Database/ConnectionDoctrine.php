@@ -49,4 +49,9 @@ readonly class ConnectionDoctrine implements ConnectionInterface
     {
         $this->entityManager->flush();
     }
+
+    public function clear(): void
+    {
+        $this->entityManager->clear();
+    }
 }

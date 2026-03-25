@@ -11,6 +11,8 @@ vendor/
 # Arquivos gerados
 /public/bundles/
 /public/build/
+/public/reports/*
+!/public/reports/.gitkeep
 
 # Arquivos de ambiente
 .env

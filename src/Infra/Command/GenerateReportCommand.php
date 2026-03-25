@@ -2,6 +2,7 @@
 
 namespace App\Infra\Command;
 //
+use App\App\Contracts\Database\ConnectionInterface;
 use App\App\UseCase\Report\Generate\GenerateReportUseCase;
 use App\App\UseCase\Report\Generate\Input\GenerateReportInput;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -16,7 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GenerateReportCommand extends Command
 {
     public function __construct(
-        private readonly GenerateReportUseCase $generateReportUseCase
+        private readonly GenerateReportUseCase $generateReportUseCase,
+        private readonly ConnectionInterface $connection
     ) {
         parent::__construct();
     }
@@ -30,8 +32,12 @@ class GenerateReportCommand extends Command
         $output->writeln('<info>Report consumer started...</info>');
         $generateReportConsumer = new GenerateReportConsumer();
         $generateReportConsumer->listen(function (array $payload) use ($output) {
+            $this->connection->clear();
             $generateReportInput = new GenerateReportInput($payload['process_id']);
-            $this->generateReportUseCase->execute($generateReportInput);
+            $result = $this->generateReportUseCase->execute($generateReportInput);
+            if ($result->getCode() >= 400) {
+                $output->writeln('<error>Failed to process report: ' . json_encode($result->getData()) . '</error>');
+            }
         });
         $output->writeln('<info>Report consumer Finished...</info>');
         return Command::SUCCESS;

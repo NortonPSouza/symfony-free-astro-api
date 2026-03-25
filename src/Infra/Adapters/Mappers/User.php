@@ -120,6 +120,7 @@ class User
 
     public function toDomain(): UserDomain
     {
+        $zodiac = $this->getZodiac();
         return new UserDomain(
             $this->getId(),
             $this->getName(),
@@ -128,7 +129,7 @@ class User
             null,
             $this->getBirthDate(),
             $this->getBirthTime(),
-            $this->getZodiac()
+            $zodiac ? \App\Domain\Entity\Zodiac::create($zodiac->getId(), $zodiac->getSign()) : null
         );
     }
 

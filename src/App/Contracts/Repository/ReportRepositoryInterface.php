@@ -26,4 +26,11 @@ interface ReportRepositoryInterface
      * @throws RepositoryException
      */
     public function updateStatus(string $reportId, ReportStatus $status): Report;
+
+    /**
+     * @param string $reportId
+     * @return Report
+     * @throws RepositoryException
+     */
+    public function findById(string $reportId): Report;
 }

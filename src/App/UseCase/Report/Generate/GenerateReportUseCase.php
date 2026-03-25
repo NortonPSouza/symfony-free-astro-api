@@ -2,6 +2,7 @@
 
 namespace App\App\UseCase\Report\Generate;
 
+use App\App\Contracts\Repository\ReportLogRepositoryInterface;
 use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\App\UseCase\Report\Generate\Input\GenerateReportInput;
 use App\App\UseCase\Report\Generate\Output\GenerateReportOutput;
@@ -11,7 +12,8 @@ use App\Domain\Types\ReportStatus;
 readonly class GenerateReportUseCase
 {
     public function __construct(
-        private ReportRepositoryInterface $reportRepository
+        private ReportRepositoryInterface $reportRepository,
+        private ReportLogRepositoryInterface $reportLogRepository
     )
     {
     }
@@ -24,7 +26,8 @@ readonly class GenerateReportUseCase
             sleep(10); //
             $this->reportRepository->updateStatus($input->getProcessId(), ReportStatus::COMPLETED);
             sleep(10);
-            // TODO: insert mongo log
+            $report = $this->reportRepository->findById($input->getProcessId());
+            $this->reportLogRepository->save($report);
             return GenerateReportOutput::success([]);
         } catch (RepositoryException $exception) {
             return GenerateReportOutput::failure($exception->getStatusCode(), $exception->getData());

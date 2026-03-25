@@ -9,7 +9,12 @@ services:
         ports:
             - "8000:8000"
         depends_on:
-            - db
+            db:
+                condition: service_started
+            mongodb:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
     db:
         image: mysql:8.0
         container_name: astro_db
@@ -33,13 +38,17 @@ services:
             - "15672:15672"
         volumes:
             - rabbitmq_data:/var/lib/rabbitmq
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 10s
+            timeout: 5s
+            retries: 5
     mongodb:
-        image: mongo:8.0.21-rc0-noble
+        image: mongo:8.0
         container_name: astro_mongodb
         environment:
             MONGO_INITDB_ROOT_USERNAME: astro_user
             MONGO_INITDB_ROOT_PASSWORD: astro_password
-            MONGO_INITDB_DATABASE: free_astro
         ports:
             - "27017:27017"
         volumes:

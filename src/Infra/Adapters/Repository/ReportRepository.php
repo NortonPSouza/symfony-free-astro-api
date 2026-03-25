@@ -70,4 +70,18 @@ readonly class ReportRepository implements ReportRepositoryInterface
             throw new RepositoryException($exception->getMessage());
         }
     }
+
+    public function findById(string $reportId): Report
+    {
+        try {
+            $entityManager = $this->connection->getEntityManager();
+            $reportMapper = $entityManager->getRepository(ReportMapper::class)->find($reportId);
+            if (!$reportMapper) {
+                throw new NotFoundException("report not found");
+            }
+            return $reportMapper->toDomain();
+        } catch (NotFoundException $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
+    }
 }

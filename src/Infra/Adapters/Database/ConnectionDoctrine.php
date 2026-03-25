@@ -2,6 +2,7 @@
 
 namespace App\Infra\Adapters\Database;
 
+use App\App\Contracts\Database\ConnectionInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 

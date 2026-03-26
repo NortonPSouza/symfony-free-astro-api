@@ -26,13 +26,13 @@ readonly class HtmlToPdfGenerator implements PdfGeneratorInterface
                 mkdir($outputDir, 0775, true);
             }
 
-            $fileName = "report_{$report->getProcessId()}_{$report->getMonth()}_{$report->getYear()}.pdf";
+            $fileName = "report_{$report->getProcessId()}.pdf";
             $filePath = $outputDir . $fileName;
             $name = htmlspecialchars($user->getName() . ' ' . $user->getFamilyName());
             $sign = htmlspecialchars($user->getZodiac()?->getSign() ?? 'Unknown');
             $period = str_pad($report->getMonth(), 2, '0', STR_PAD_LEFT) . '/' . $report->getYear();
             $fortune = htmlspecialchars($this->fortuneProvider->getRandomFortune());
-            $date = (new \DateTime())->format('d/m/Y');
+            $date = new \DateTime()->format('d/m/Y');
             $signEmoji = $this->getSignEmoji($sign);
 
             $html = <<<HTML
@@ -91,7 +91,6 @@ readonly class HtmlToPdfGenerator implements PdfGeneratorInterface
             $html2pdf = new Html2Pdf();
             $html2pdf->writeHTML($html);
             $html2pdf->output($filePath, 'F');
-
             return $filePath;
         }  catch (Html2PdfException $exception) {
             throw new PdfGenerationException($exception->getMessage());

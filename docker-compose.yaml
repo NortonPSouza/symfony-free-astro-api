@@ -15,6 +15,8 @@ services:
                 condition: service_started
             rabbitmq:
                 condition: service_healthy
+            redis:
+                condition: service_started
     db:
         image: mysql:8.0
         container_name: astro_db
@@ -53,7 +55,15 @@ services:
             - "27017:27017"
         volumes:
             - mongodb_data:/data/db
+    redis:
+        image: redis:8.6
+        container_name: astro_redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
 volumes:
     db_data:
     rabbitmq_data:
     mongodb_data:
+    redis_data:

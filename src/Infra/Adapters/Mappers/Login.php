@@ -20,6 +20,12 @@ class Login
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: false)]
     private string $password;
 
+    #[ORM\Column(name: 'refresh_token', type: 'string', length: 512, nullable: true)]
+    private ?string $refreshToken = null;
+
+    #[ORM\Column(name: 'refresh_token_expires_at', type: 'datetime', nullable: true)]
+    private ?\DateTime $refreshTokenExpiresAt = null;
+
     public function getId(): string
     {
         return $this->id;
@@ -53,4 +59,25 @@ class Login
         return $this;
     }
 
+    public function getRefreshToken(): ?string
+    {
+        return $this->refreshToken;
+    }
+
+    public function setRefreshToken(?string $refreshToken): Login
+    {
+        $this->refreshToken = $refreshToken;
+        return $this;
+    }
+
+    public function getRefreshTokenExpiresAt(): ?\DateTime
+    {
+        return $this->refreshTokenExpiresAt;
+    }
+
+    public function setRefreshTokenExpiresAt(?\DateTime $refreshTokenExpiresAt): Login
+    {
+        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
+        return $this;
+    }
 }

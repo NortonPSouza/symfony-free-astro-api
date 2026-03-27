@@ -22,9 +22,6 @@ readonly class UserRepository implements UserRepositoryInterface
     {
     }
 
-    /**
-     * @throws RepositoryException|ORMException
-     */
     public function create(User $user): array
     {
         try {
@@ -58,9 +55,6 @@ readonly class UserRepository implements UserRepositoryInterface
         }
     }
 
-    /**
-     * @throws RepositoryException
-     */
     public function find(string $id): ?User
     {
         try {
@@ -75,9 +69,21 @@ readonly class UserRepository implements UserRepositoryInterface
         }
     }
 
-    /**
-     * @throws RepositoryException
-     */
+    public function findByEmail(string $email): User
+    {
+        try {
+            $entityManager = $this->connection->getEntityManager();
+            $userMapper = $entityManager->getRepository(UserMapper::class)
+                ->findOneBy(['email' => $email]);
+            if (!$userMapper) {
+                throw new NotFoundException("User not Found");
+            }
+            return $userMapper->toDomain();
+        } catch (\Exception $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
+    }
+
     public function delete(User $user): array
     {
         try {

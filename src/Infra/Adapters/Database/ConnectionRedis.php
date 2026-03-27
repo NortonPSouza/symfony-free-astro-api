@@ -12,9 +12,10 @@ readonly class ConnectionRedis implements CacheInterface
     public function __construct()
     {
         $this->client = new Client([
-            'scheme' => 'tcp',
-            'host'   => $_ENV['REDIS_HOST'],
-            'port'   => $_ENV['REDIS_PORT'],
+            'scheme'   => 'tcp',
+            'host'     => $_ENV['REDIS_HOST'],
+            'port'     => $_ENV['REDIS_PORT'],
+            'password' => $_ENV['REDIS_PASSWORD'],
         ]);
     }
 

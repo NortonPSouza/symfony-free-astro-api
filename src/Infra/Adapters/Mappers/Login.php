@@ -3,7 +3,7 @@
 namespace App\Infra\Adapters\Mappers;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
-
+use App\Domain\Entity\Login as LoginDomain;
 #[ORM\Entity]
 #[ORM\Table(name: 'login')]
 #[Index(name: "email_login_idx", columns: ["email"])]
@@ -20,11 +20,17 @@ class Login
     #[ORM\Column(name: 'password', type: 'string', length: 255, nullable: false)]
     private string $password;
 
-    #[ORM\Column(name: 'refresh_token', type: 'string', length: 512, nullable: true)]
-    private ?string $refreshToken = null;
+    #[ORM\Column(name: 'refresh_token', type: 'string', length: 512, nullable: true, options: ['default' => null])]
+    private ?string $refreshToken;
 
-    #[ORM\Column(name: 'refresh_token_expires_at', type: 'datetime', nullable: true)]
-    private ?\DateTime $refreshTokenExpiresAt = null;
+    #[ORM\Column(name: 'refresh_token_expires_at', type: 'datetime', nullable: true, options: ['default' => null])]
+    private ?\DateTime $refreshTokenExpiresAt;
+
+    public function __construct()
+    {
+        $this->setRefreshToken(null);
+        $this->setRefreshTokenExpiresAt(null);
+    }
 
     public function getId(): string
     {
@@ -79,5 +85,16 @@ class Login
     {
         $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
         return $this;
+    }
+
+    public function toDomain(): LoginDomain
+    {
+        return new LoginDomain(
+            $this->getId(),
+            $this->getEmail(),
+            $this->getPassword(),
+            $this->getRefreshToken(),
+            $this->getRefreshTokenExpiresAt()
+        );
     }
 }

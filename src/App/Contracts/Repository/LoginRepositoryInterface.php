@@ -15,11 +15,4 @@ interface LoginRepositoryInterface
      */
     public function findByEmail(string $email): Login;
 
-    /**
-     * @param Login $login
-     * @return void
-     * @throws RepositoryException|NotFoundException
-     */
-    public function updateToken(Login $login): void;
-
 }

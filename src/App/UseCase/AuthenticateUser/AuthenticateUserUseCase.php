@@ -33,11 +33,12 @@ readonly class AuthenticateUserUseCase
             }
             $user = $this->userRepository->findByEmail($input->getEmail());
             $refreshToken = $this->tokenManager->generate($user, 604800);
-            $login->setRefreshToken($refreshToken)
-                ->setExpiresIn(new \DateTime()->add(new \DateInterval('P7D')));
-            $this->loginRepository->updateToken($login);
             $accessToken = $this->tokenManager->generate($user, 900);
-            return AuthenticateUserOutput::success(['access_token' => $accessToken]);
+            return AuthenticateUserOutput::success([
+                'access_token' => $accessToken,
+                'refresh_token' => $refreshToken,
+                'token_type' => 'Bearer'
+            ]);
         } catch (RepositoryException|NotFoundException $exception){
             return AuthenticateUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }

@@ -31,22 +31,4 @@ readonly class LoginRepository implements LoginRepositoryInterface
             throw new RepositoryException($exception->getMessage());
         }
     }
-
-    public function updateToken(Login $login): void
-    {
-        try {
-            $entityManager = $this->connection->getEntityManager();
-            $loginMapper = $entityManager->getRepository(LoginMapper::class)->find($login->getId());
-            if (!$loginMapper) {
-                throw new NotFoundException("login not found");
-            }
-            $loginMapper
-                ->setRefreshToken($login->getRefreshToken())
-                ->setRefreshTokenExpiresAt($login->getExpiresIn());
-            $entityManager->persist($loginMapper);
-            $entityManager->flush();
-        } catch (\Exception $exception){
-            throw new RepositoryException($exception->getMessage());
-        }
-    }
 }

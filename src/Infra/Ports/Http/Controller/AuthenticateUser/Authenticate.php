@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/authenticate/user')]
-class AuthenticateUser extends AbstractController
+#[Route('/api/v1/token')]
+class Authenticate extends AbstractController
 {
     public function __construct(
         private readonly ConnectionDoctrine $connection,

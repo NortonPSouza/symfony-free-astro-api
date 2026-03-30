@@ -13,7 +13,8 @@ readonly class AuthenticateUserInput
      */
     public function __construct(
         private ?string $email,
-        private ?string $password
+        private ?string $password,
+        private ?string $grant_type
     )
     {
         try {
@@ -30,7 +31,8 @@ readonly class AuthenticateUserInput
     {
         return new AuthenticateUserInput(
             $inputRequest['email'] ?? null,
-            $inputRequest['password'] ?? null
+            $inputRequest['password'] ?? null,
+            $inputRequest['grant_type'] ?? null
         );
     }
 
@@ -44,11 +46,17 @@ readonly class AuthenticateUserInput
         return $this->password;
     }
 
+    public function getGrantType(): ?string
+    {
+        return $this->grant_type;
+    }
+
     public function toArray(): array
     {
         return [
             'email' => $this->getEmail(),
-            'password' => $this->getPassword()
+            'password' => $this->getPassword(),
+            'grant_type' => $this->getGrantType()
         ];
     }
 }

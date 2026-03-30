@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/report')]
+#[Route('/api/v1/report',  defaults: ['_authenticated' => true])]
 final class Report extends AbstractController
 {
 

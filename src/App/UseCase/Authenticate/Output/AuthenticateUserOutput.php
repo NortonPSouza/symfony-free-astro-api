@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\UseCase\AuthenticateUser\Output;
+namespace App\App\UseCase\Authenticate\Output;
 
 use App\App\UseCase\Shared\GenericOutput;
 

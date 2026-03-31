@@ -2,7 +2,7 @@
 
 namespace App\App\Contracts\Repository;
 
-use App\Infra\Adapters\Mappers\Zodiac;
+use App\Domain\Entity\Zodiac;
 
 interface ZodiacRepositoryInterface
 {

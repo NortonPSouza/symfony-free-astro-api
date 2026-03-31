@@ -3,6 +3,7 @@
 namespace App\Infra\Adapters\Encoder;
 
 use App\App\Contracts\Validation\PasswordEncoderInterface;
+use App\Domain\Exceptions\InvalidParamsException;
 
 final class BcryptPasswordEncoder implements PasswordEncoderInterface
 {
@@ -11,8 +12,11 @@ final class BcryptPasswordEncoder implements PasswordEncoderInterface
         return password_hash($password, PASSWORD_BCRYPT);
     }
 
-    public function verify(string $password, string $hashedPassword): bool
+    public function verify(string $password, string $hashedPassword): void
     {
-        return password_verify($password, $hashedPassword);
+        $isValid =  password_verify($password, $hashedPassword);
+        if (!$isValid) {
+            throw new InvalidParamsException('Invalid password');
+        }
     }
 }

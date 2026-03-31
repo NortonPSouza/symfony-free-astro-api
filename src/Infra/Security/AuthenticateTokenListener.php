@@ -23,10 +23,11 @@ final readonly class AuthenticateTokenListener
             return;
         }
         try {
-            $token = $request->headers->get('Authorization');
-            if (!$token) {
-                throw new UnauthorizedException('Token not provided');
+            $authorization = $request->headers->get('Authorization');
+            if (!$authorization || !str_starts_with($authorization, 'Bearer ')) {
+                throw new UnauthorizedException('Invalid authorization header');
             }
+            $token = substr($authorization, 7);
             $userId = $this->tokenManager->validate($token);
             $request->attributes->set('user_id', $userId);
         } catch (UnauthorizedException $exception) {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infra\Adapters\Mappers;
-use Doctrine\ORM\Mapping as ORM;
+namespace App\Infra\Mappers;
 use App\Domain\Entity\User as UserDomain;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
 #[ORM\Entity]

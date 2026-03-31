@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Infra\Adapters\Mappers;
+namespace App\Infra\Mappers;
+use App\Domain\Entity\Login as LoginDomain;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
-use App\Domain\Entity\Login as LoginDomain;
+
 #[ORM\Entity]
 #[ORM\Table(name: 'login')]
 #[Index(name: "email_login_idx", columns: ["email"])]

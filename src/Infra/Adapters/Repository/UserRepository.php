@@ -7,11 +7,10 @@ use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;
 use App\Domain\Exceptions\RepositoryException;
 use App\Infra\Adapters\Database\ConnectionDoctrine;
-use App\Infra\Adapters\Mappers\Login;
-use App\Infra\Adapters\Mappers\LoginUser;
-use App\Infra\Adapters\Mappers\User as UserMapper;
-use App\Infra\Adapters\Mappers\Zodiac;
-use Doctrine\ORM\Exception\ORMException;
+use App\Infra\Mappers\Login;
+use App\Infra\Mappers\LoginUser;
+use App\Infra\Mappers\User as UserMapper;
+use App\Infra\Mappers\Zodiac;
 
 readonly class UserRepository implements UserRepositoryInterface
 {
@@ -78,7 +77,14 @@ readonly class UserRepository implements UserRepositoryInterface
             if (!$userMapper) {
                 throw new NotFoundException("User not Found");
             }
-            return $userMapper->toDomain();
+            $loginMapper = $entityManager->getRepository(Login::class)
+                ->findOneBy(['email' => $email]);
+            if (!$loginMapper) {
+                throw new NotFoundException("Login not Found");
+            }
+            $userDomain = $userMapper->toDomain();
+            $userDomain->setPassword($loginMapper->getPassword());
+            return $userDomain;
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }

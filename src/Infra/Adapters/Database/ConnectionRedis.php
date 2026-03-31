@@ -2,10 +2,10 @@
 
 namespace App\Infra\Adapters\Database;
 
-use App\App\Contracts\Database\CacheInterface;
+use App\App\Contracts\Database\MemoryInterface;
 use Predis\Client;
 
-readonly class ConnectionRedis implements CacheInterface
+readonly class ConnectionRedis implements MemoryInterface
 {
     private Client $client;
 

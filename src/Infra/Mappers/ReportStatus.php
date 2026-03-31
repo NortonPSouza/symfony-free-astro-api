@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Adapters\Mappers;
+namespace App\Infra\Mappers;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]

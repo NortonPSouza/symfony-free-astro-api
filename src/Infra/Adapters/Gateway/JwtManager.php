@@ -21,6 +21,9 @@ readonly class JwtManager implements TokenManagerInterface
         return JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
     }
 
+    /**
+     * @throws UnauthorizedException
+     */
     public function validate(string $token): string
     {
         try {

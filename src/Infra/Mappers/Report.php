@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infra\Adapters\Mappers;
+namespace App\Infra\Mappers;
+use App\Domain\Entity\Report as ReportDomain;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Domain\Entity\Report as ReportDomain;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'report')]

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\App\UseCase\AuthenticateUser\Input;
+namespace App\App\UseCase\Authenticate\Input;
 
-use App\App\UseCase\AuthenticateUser\Validation\AuthenticateUserCreateValidation;
+use App\App\UseCase\Authenticate\Validation\AuthenticateValidation;
 use App\Domain\Exceptions\InvalidParamsException;
 
-readonly class AuthenticateUserInput
+readonly class AuthenticateInput
 {
 
     /**
@@ -14,11 +14,12 @@ readonly class AuthenticateUserInput
     public function __construct(
         private ?string $email,
         private ?string $password,
-        private ?string $grant_type
+        private ?string $grantType,
+        private ?string $refreshToken
     )
     {
         try {
-            AuthenticateUserCreateValidation::validate($this->toArray());
+            AuthenticateValidation::validate($this->toArray());
         } catch (\Exception $exception) {
             throw new InvalidParamsException($exception->getMessage());
         }
@@ -27,12 +28,13 @@ readonly class AuthenticateUserInput
     /**
      * @throws InvalidParamsException
      */
-    public static function fromArray(array $inputRequest): AuthenticateUserInput
+    public static function fromArray(array $inputRequest): AuthenticateInput
     {
-        return new AuthenticateUserInput(
+        return new AuthenticateInput(
             $inputRequest['email'] ?? null,
             $inputRequest['password'] ?? null,
-            $inputRequest['grant_type'] ?? null
+            $inputRequest['grant_type'] ?? null,
+            $inputRequest['refresh_token'] ?? null
         );
     }
 
@@ -48,15 +50,22 @@ readonly class AuthenticateUserInput
 
     public function getGrantType(): ?string
     {
-        return $this->grant_type;
+        return $this->grantType;
     }
+
+    public function getRefreshToken(): ?string
+    {
+        return $this->refreshToken;
+    }
+
 
     public function toArray(): array
     {
         return [
             'email' => $this->getEmail(),
             'password' => $this->getPassword(),
-            'grant_type' => $this->getGrantType()
+            'grant_type' => $this->getGrantType(),
+            'refresh_token' => $this->getRefreshToken()
         ];
     }
 }

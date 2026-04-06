@@ -20,6 +20,7 @@ readonly class ZodiacRepository implements ZodiacRepositoryInterface
     /**
      * @throws RepositoryException
      */
+    // TODO: fix query for Capricorn - sign that crosses year boundary (start_date > end_date)
     public function getSignByBirth(\DateTime $birth): ZodiacDomain
     {
         try {

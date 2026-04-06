@@ -10,6 +10,7 @@ use App\App\UseCase\Authenticate\Input\AuthenticateInput;
 use App\App\UseCase\Authenticate\Output\AuthenticateUserOutput;
 use App\Domain\Exceptions\GenericException;
 use App\Domain\Types\GrantTypeLogin;
+use App\Domain\Types\LifeTimeToken;
 
 readonly class AuthenticateUseCase
 {
@@ -35,14 +36,14 @@ readonly class AuthenticateUseCase
                 $user = $this->userRepository->findByEmail($input->getEmail());
                 $this->passwordEncoder->verify($input->getPassword(), $user->getPassword());
             }
-            $refreshToken = $this->tokenManager->generate($user, 604800);
-            $accessToken = $this->tokenManager->generate($user, 900);
+            $refreshToken = $this->tokenManager->generate($user, LifeTimeToken::SEVEN_DAYS->getSeconds());
+            $accessToken = $this->tokenManager->generate($user, LifeTimeToken::FIFTEEN_MINUTES->getSeconds());
             $payloadToken = [
-                'access_token' => $accessToken,
-                'refresh_token' => $refreshToken,
+                'access_token' => $accessToken->getToken(),
+                'refresh_token' => $refreshToken->getToken(),
                 'token_type' => 'Bearer'
             ];
-            $this->tokenMemory->setSessions($user->getId(), $payloadToken, 604800);
+            $this->tokenMemory->setSessions($user->getId(), $payloadToken, LifeTimeToken::SEVEN_DAYS->getSeconds());
             return AuthenticateUserOutput::success($payloadToken);
         } catch (GenericException $exception){
             return AuthenticateUserOutput::failure($exception->getStatusCode(), $exception->getData());

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/user/{userId}')]
+#[Route('/api/v1/user/{userId}', defaults: ['_authenticated' => true])]
 final class Find extends AbstractController
 {
     public function __construct(

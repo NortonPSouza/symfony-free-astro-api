@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Command;
+namespace App\Infra\Ports\Command;
 
 use App\Infra\Adapters\Queue\RabbitQueue;
 

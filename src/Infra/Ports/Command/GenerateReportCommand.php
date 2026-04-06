@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Command;
+namespace App\Infra\Ports\Command;
 //
 use App\App\Contracts\Database\ConnectionInterface;
 use App\App\UseCase\Report\Generate\GenerateReportUseCase;
@@ -34,6 +34,7 @@ class GenerateReportCommand extends Command
         $generateReportConsumer->listen(function (array $payload) use ($output) {
             $this->connection->clear();
             $generateReportInput = new GenerateReportInput($payload['process_id']);
+            sleep(450);
             $result = $this->generateReportUseCase->execute($generateReportInput);
             if ($result->getCode() >= 400) {
                 $output->writeln('<error>Failed to process report: ' . json_encode($result->getData()) . '</error>');

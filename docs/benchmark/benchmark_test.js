@@ -20,6 +20,18 @@ export const options = {
             ],
             tags: { scenario: 'load' },
         },
+        stress: {
+            executor: 'ramping-vus',
+            startVUs: 0,
+            stages: [
+                { duration: '20s', target: 20  },
+                { duration: '5s',  target: 500 },
+                { duration: '20s', target: 500 },
+                { duration: '5s',  target: 20  },
+                { duration: '20s', target: 0   },
+            ],
+            tags: { scenario: 'stress' },
+        },
     },
     thresholds: {
         http_req_duration: ['p(95)<500'],

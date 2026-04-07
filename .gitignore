@@ -60,5 +60,9 @@ yarn-error.log*
 # Coverage
 coverage/
 
+# Benchmark reports
+docs/benchmark/report.html
+docs/benchmark/report.json
+
 # Docker (opcional)
 docker-compose.override.yml

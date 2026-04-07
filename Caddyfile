@@ -1,14 +1,13 @@
 :8000 {
-    root * /var/www/html/public
-
-    encode gzip zstd
-
-    php_server {
-                   worker {
-                       file ./public/index.php
-                       max_requests 1000
-                   }
-               }
-
-    file_server
+	root * /var/www/html/public
+	encode gzip zstd
+	php_server {
+		worker {
+			file ./public/index.php
+		   	num 4
+			env FRANKENPHP_MAX_REQUESTS 1000
+			max_consecutive_failures 5
+		}
+	}
+	file_server
 }

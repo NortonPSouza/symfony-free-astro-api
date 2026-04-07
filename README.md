@@ -90,3 +90,19 @@ INSERT INTO report_status (id, description) VALUES
 (3, 'COMPLETED'),
 (4, 'FAILURE');
 ```
+
+## 📈 Benchmark
+
+Run the k6 load test against the API:
+
+```bash
+docker compose --profile benchmark run k6 run /scripts/report.js
+```
+
+To pass a custom base URL or user ID:
+
+```bash
+docker compose --profile benchmark run k6 run -e BASE_URL=http://astro:8000 -e USER_ID=your-uuid /scripts/report.js
+```
+
+Scripts are located in `docs/benchmark/`.

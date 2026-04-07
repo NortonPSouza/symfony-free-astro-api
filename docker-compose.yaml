@@ -17,6 +17,22 @@ services:
                 condition: service_healthy
             redis:
                 condition: service_started
+    consumer:
+        build: ./local
+        image: php:public
+        container_name: astro_consumer
+        command: ./local/consumer.sh
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            db:
+                condition: service_started
+            mongodb:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
+            redis:
+                condition: service_started
     db:
         image: mysql:8.0
         container_name: astro_db
@@ -63,6 +79,13 @@ services:
             - "6379:6379"
         volumes:
             - redis_data:/data
+    k6:
+        image: grafana/k6
+        container_name: astro_k6
+        volumes:
+            - ./docs/benchmark:/scripts
+        profiles:
+            - benchmark
     grafana:
         image: grafana/grafana:latest
         container_name: astro_grafana

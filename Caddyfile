@@ -1,0 +1,14 @@
+:8000 {
+    root * /var/www/html/public
+
+    encode gzip zstd
+
+    php_server {
+                   worker {
+                       file ./public/index.php
+                       max_requests 1000
+                   }
+               }
+
+    file_server
+}

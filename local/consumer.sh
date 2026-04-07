@@ -5,4 +5,4 @@ if [ ! -d "/var/www/html/vendor" ]; then
     composer install
 fi
 
-exec frankenphp run --config /var/www/html/Caddyfile
+exec php bin/console app:consumer:report

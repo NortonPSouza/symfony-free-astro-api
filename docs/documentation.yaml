@@ -1,0 +1,272 @@
+openapi: 3.1.0
+info:
+  title: FreeAstroAPI
+  description: Free RESTful API for astrology horoscopes, numerology and spiritual insights
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+tags:
+  - name: Health
+  - name: Auth
+  - name: User
+  - name: Report
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: API health check
+      responses:
+        '200':
+          description: API is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Free Astro for read your future
+
+  /api/v1/token:
+    post:
+      tags: [Auth]
+      summary: Authenticate user (login or refresh token)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+                - title: Login
+                  required: [grant_type, email, password]
+                  properties:
+                    grant_type:
+                      type: string
+                      enum: [token]
+                    email:
+                      type: string
+                      format: email
+                      example: ana.silva@email.com
+                    password:
+                      type: string
+                      example: "123456"
+                - title: Refresh
+                  required: [grant_type, refresh_token]
+                  properties:
+                    grant_type:
+                      type: string
+                      enum: [refresh]
+                    refresh_token:
+                      type: string
+                      example: eyJhbGciOiJIUzI1NiJ9...
+      responses:
+        '200':
+          description: Authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/user:
+    post:
+      tags: [User]
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required: [name, family_name, email, password, birth_date]
+              properties:
+                name:
+                  type: string
+                  example: Ana
+                family_name:
+                  type: string
+                  example: Silva
+                email:
+                  type: string
+                  format: email
+                  example: ana.silva@email.com
+                password:
+                  type: string
+                  example: "123456"
+                birth_date:
+                  type: string
+                  format: date
+                  example: "1990-04-10"
+                birth_time:
+                  type: string
+                  example: "08:30"
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOutput'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+
+  /api/v1/user/{userId}:
+    get:
+      tags: [User]
+      summary: Find user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOutput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [User]
+      summary: Delete user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOutput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/report:
+    post:
+      tags: [Report]
+      summary: Create a monthly horoscope report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required: [user_id, month, year]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  example: 019d457a-a891-7ac3-8796-40ea3a3b5f23
+                month:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                  example: 6
+                year:
+                  type: integer
+                  example: 2025
+      responses:
+        '201':
+          description: Report queued for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOutput'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 019d457a-a891-7ac3-8796-40ea3a3b5f23
+
+  schemas:
+    GenericOutput:
+      type: object
+      properties:
+        title:
+          type: string
+        path:
+          type: string
+        data:
+          type: object
+        code:
+          type: integer
+        time:
+          type: string
+          example: "01/06/2025 14:30:00"
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9...
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9...
+        token_type:
+          type: string
+          example: Bearer
+
+  responses:
+    InvalidParams:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              exception:
+                type: string
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              exception:
+                type: string
+                example: Invalid or expired token
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              exception:
+                type: string
+                example: User not Found

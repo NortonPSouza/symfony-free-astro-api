@@ -1,18 +1,17 @@
 ARG PHP_VERSION=8.4
-FROM php:${PHP_VERSION}-cli
+FROM dunglas/frankenphp:1-php${PHP_VERSION}
 
-# Install Basic packages
+# Install basic packages
 RUN apt update && apt install -y \
-    zip curl libzip-dev libssl-dev \
+    zip libzip-dev libssl-dev \
     git unzip libicu-dev \
-    librabbitmq-dev \
-    libssl-dev pkg-config \
+    librabbitmq-dev pkg-config \
     libpng-dev libjpeg-dev libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP Extensions
+# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql sockets gd
+    && docker-php-ext-install pdo pdo_mysql sockets gd intl zip
 
 # Install AMQP (RabbitMQ)
 RUN pecl install amqp && docker-php-ext-enable amqp
@@ -21,16 +20,10 @@ RUN pecl install amqp && docker-php-ext-enable amqp
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 # Fix git ownership (diff user in volume container)
 RUN git config --global --add safe.directory /var/www/html
 
 # Set working directory
 WORKDIR /var/www/html
-
-# Expose port
-EXPOSE 8000
-
-# Keep container running
-CMD ["tail", "-f", "/dev/null"]

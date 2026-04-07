@@ -1,5 +1,5 @@
 ARG PHP_VERSION=8.4
-FROM dunglas/frankenphp:1-php${PHP_VERSION}
+FROM php:${PHP_VERSION}-cli
 
 # Install basic packages
 RUN apt update && apt install -y \
@@ -27,3 +27,6 @@ RUN git config --global --add safe.directory /var/www/html
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Expose port
+EXPOSE 8000

@@ -82,6 +82,7 @@ services:
     k6:
         image: grafana/k6
         container_name: astro_k6
+        user: "${UID}:${GID}"
         volumes:
             - ./docs/benchmark:/scripts
         profiles:

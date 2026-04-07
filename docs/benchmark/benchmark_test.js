@@ -28,8 +28,24 @@ export const options = {
 };
 
 const BASE_URL = __ENV.BASE_URL || 'http://astro:8000';
+const EMAIL    = __ENV.EMAIL    || 'ana.silva@email.com';
+const PASSWORD = __ENV.PASSWORD || '123456';
 
-export default function () {
+export function setup() {
+    const res = http.post(`${BASE_URL}/api/v1/token`, {
+        grant_type: 'token',
+        email: EMAIL,
+        password: PASSWORD,
+    });
+    const token = res.json('access_token');
+    return { token };
+}
+
+export default function ({ token }) {
+    const params = {
+        headers: { Authorization: `Bearer ${token}` },
+    };
+
     const healthRes = http.get(`${BASE_URL}/health`);
     check(healthRes, {
         'health status 200': (r) => r.status === 200,
@@ -42,7 +58,8 @@ export default function () {
             user_id: __ENV.USER_ID || '019d457a-a891-7ac3-8796-40ea3a3b5f23',
             month: '6',
             year: '2025',
-        }
+        },
+        params
     );
     check(reportRes, {
         'report status 201': (r) => r.status === 201,
@@ -55,5 +72,6 @@ export default function () {
 export function handleSummary(data) {
     return {
         '/scripts/report.html': htmlReport(data),
+        '/scripts/report.json': JSON.stringify(data, null, 2),
     };
 }

@@ -1,34 +1,46 @@
-name: CI
+name: CI/CD
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  tests:
-    name: CI Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and start infrastructure services
-        run: docker compose up -d --build --wait astro db rabbitmq mongodb redis
-
-      - name: Install composer dependencies
-        run: docker compose exec -T astro composer install --no-interaction --prefer-dist
-
-      - name: Start consumer service
-        run: docker compose up -d consumer
-
-      - name: Run database migrations
-        run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction
-
-      - name: Run integration tests with PHPUnit
-        run: docker compose exec -T astro php bin/phpunit --testdox
-
-      - name: Stop all services
-        if: always()
-        run: docker compose down
+    push_tests:
+        name: CI Tests
+        runs-on: ubuntu-latest
+        
+        steps:
+            - uses: actions/checkout@v5
+            
+            - name: Build and start infrastructure services
+              run: docker compose up -d --build --wait astro db rabbitmq mongodb redis
+            
+            - name: Install composer dependencies
+              run: docker compose exec -T astro composer install --no-interaction --prefer-dist
+            
+            - name: Start consumer service
+              run: docker compose up -d consumer
+            
+            - name: Run database migrations
+              run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction
+            
+            - name: Run integration tests with PHPUnit
+              run: docker compose exec -T astro php bin/phpunit --testdox
+            
+            - name: Stop all services
+              if: always()
+              run: docker compose down
+    
+    build_deploy:
+        name: CD Build Image
+        runs-on: ubuntu-latest
+        needs: push_tests
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        
+        steps:
+            - uses: actions/checkout@v5
+            
+            - name: Build production image
+              run: docker build -t astro-app:${{ github.sha }} ./local

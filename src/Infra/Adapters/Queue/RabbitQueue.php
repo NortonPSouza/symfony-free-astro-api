@@ -51,12 +51,18 @@ abstract class RabbitQueue
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
         $channel->queue_declare($queue, durable: true, auto_delete: false);
         $channel->queue_bind($queue, $queue, $queue);
+        $channel->basic_qos(prefetch_size: 0, prefetch_count: 1, a_global: false);
         $channel->basic_consume(
             queue: $queue,
             callback: function (AMQPMessage $message) use ($callback) {
-                $payload = json_decode($message->getBody(), true);
-                $callback($payload);
-                $message->ack();
+                try {
+                    $payload = json_decode($message->getBody(), true);
+                    $callback($payload);
+                    $message->ack();
+                } catch (\Throwable $e) {
+                    fwrite(STDERR, 'Queue error: ' . $e->getMessage() . PHP_EOL);
+                    $message->nack();
+                }
             }
         );
         while ($channel->is_consuming()) {

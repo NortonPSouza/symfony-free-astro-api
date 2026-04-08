@@ -22,6 +22,7 @@ services:
         image: php:public
         container_name: astro_consumer
         command: ./local/consumer.sh
+        restart: unless-stopped
         volumes:
             - ./:/var/www/html
         depends_on:

@@ -22,7 +22,7 @@ readonly class FindUserUseCase
     {
         try {
             $user = $this->userRepository->find($input->getId());
-            return FindUserOutput::success($user);
+            return FindUserOutput::success($user->toArray());
         } catch (RepositoryException|NotFoundException $exception) {
            return FindUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }

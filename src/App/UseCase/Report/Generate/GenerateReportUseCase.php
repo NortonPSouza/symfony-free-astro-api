@@ -26,7 +26,6 @@ readonly class GenerateReportUseCase
     {
         try {
             $this->reportRepository->updateStatus($input->getProcessId(), ReportStatus::PROCESSING);
-            sleep(120);
             $report = $this->reportRepository->findById($input->getProcessId());
             $user = $this->userRepository->find($report->getUserId());
             $this->pdfGenerator->generate($user, $report);

@@ -17,7 +17,6 @@ readonly class HtmlToPdfGenerator implements PdfGeneratorInterface
         private string $projectDir
     ) {}
 
-
     public function generate(User $user, Report $report): string
     {
         try {
@@ -33,86 +32,112 @@ readonly class HtmlToPdfGenerator implements PdfGeneratorInterface
             $period = str_pad($report->getMonth(), 2, '0', STR_PAD_LEFT) . '/' . $report->getYear();
             $fortune = htmlspecialchars($this->fortuneProvider->getRandomFortune());
             $date = new \DateTime()->format('d/m/Y');
-            $signEmoji = $this->getSignEmoji($sign);
+            $signSymbol = $this->getSignSymbol($sign);
 
             $html = <<<HTML
-            <page backtop="10mm" backbottom="10mm" backleft="15mm" backright="15mm">
-                <style type="text/css">
-                    .header { text-align: center; margin-bottom: 10mm; }
-                    .title { font-size: 28px; color: #2c1654; font-family: times; }
-                    .subtitle { font-size: 13px; color: #7c6f9b; letter-spacing: 2px; }
-                    .divider { border-bottom: 2px solid #d4af37; width: 60%; margin: 6mm auto; }
-                    .sign-badge {
-                        text-align: center; font-size: 40px; margin: 4mm auto;
-                    }
-                    .sign-name { text-align: center; font-size: 22px; color: #d4af37; font-weight: bold; }
-                    .info-table { width: 80%; margin: 6mm auto; font-size: 13px; }
-                    .info-table td { padding: 2mm 4mm; }
-                    .info-label { color: #7c6f9b; font-weight: bold; text-align: right; width: 35%; }
-                    .info-value { color: #2c1654; }
-                    .fortune-box {
-                        background-color: #f8f4ff;
-                        border-left: 4px solid #d4af37;
-                        padding: 6mm;
-                        margin: 8mm auto;
-                        width: 80%;
-                        font-size: 14px;
-                        color: #3b2d5e;
-                        line-height: 1.6;
-                        font-style: italic;
-                    }
-                    .fortune-title { font-size: 16px; color: #2c1654; font-weight: bold; font-style: normal; margin-bottom: 3mm; }
-                    .footer { text-align: center; font-size: 10px; color: #aaa; margin-top: 15mm; }
-                </style>
-
-                <div class="header">
-                    <div class="subtitle">✦ F R E E A S T R O ✦</div>
-                    <div class="title">Monthly Horoscope Report</div>
-                </div>
-                <div class="divider"></div>
-
-                <div class="sign-badge">{$signEmoji}</div>
-                <div class="sign-name">{$sign}</div>
-
-                <table class="info-table">
-                    <tr><td class="info-label">Name:</td><td class="info-value">{$name}</td></tr>
-                    <tr><td class="info-label">Period:</td><td class="info-value">{$period}</td></tr>
-                    <tr><td class="info-label">Generated:</td><td class="info-value">{$date}</td></tr>
+            <page backtop="8mm" backbottom="8mm" backleft="10mm" backright="10mm">
+                <table style="width: 100%; border: 3px solid #4c1d95; background-color: #ede9fe; padding: 2mm;">
+                    <tr><td>
+                    <table style="width: 100%; border: 2px solid #7c3aed; background-color: #f5f0ff; padding: 2mm;">
+                        <tr><td>
+                        <table style="width: 100%; border: 1px solid #c4b5fd; background-color: #faf5ff;">
+                            <tr>
+                                <td style="text-align: center; font-size: 13px; color: #a855f7; letter-spacing: 2px; font-family: times; padding-top: 6mm;">
+                                    ~ F R E E  A S T R O ~
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center; font-size: 28px; color: #6b21a8; font-family: times;">
+                                    Monthly Horoscope Report
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: 2px solid #c4b5fd;">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center; font-size: 22px; color: #6b21a8; font-family: times;">
+                                    [{$signSymbol}]
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center; font-size: 22px; color: #7c3aed; font-weight: bold; font-family: times;">
+                                    {$sign}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: 2px solid #c4b5fd;">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table style="width: 100%; font-size: 13px;">
+                                        <tr>
+                                            <td style="width: 35%; text-align: right; color: #a855f7; font-weight: bold;">Name:</td>
+                                            <td style="color: #3b0764;">{$name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 35%; text-align: right; color: #a855f7; font-weight: bold;">Period:</td>
+                                            <td style="color: #3b0764;">{$period}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 35%; text-align: right; color: #a855f7; font-weight: bold;">Generated:</td>
+                                            <td style="color: #3b0764;">{$date}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center; font-size: 16px; color: #6b21a8; font-weight: bold; font-family: times; padding-top: 4mm;">
+                                    Your Cosmic Reading
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4mm;">
+                                    <table style="width: 100%; background-color: #ede9fe; border-left: 4px solid #7c3aed;">
+                                        <tr>
+                                            <td style="font-size: 14px; color: #3b0764; line-height: 1.6; font-style: italic; font-family: times; padding: 4mm;">
+                                                {$fortune}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center; font-size: 10px; color: #a78bfa; font-family: times; padding-top: 8mm; padding-bottom: 6mm;">
+                                    Generated by FreeAstroAPI ~ The stars have spoken
+                                </td>
+                            </tr>
+                        </table>
+                        </td></tr>
+                    </table>
+                    </td></tr>
                 </table>
-
-                <div class="fortune-box">
-                    <div class="fortune-title">🔮 Your Cosmic Reading</div>
-                    {$fortune}
-                </div>
-
-                <div class="footer">Generated by FreeAstroAPI — The stars have spoken ✦</div>
             </page>
             HTML;
             $html2pdf = new Html2Pdf();
             $html2pdf->writeHTML($html);
             $html2pdf->output($filePath, 'F');
             return $filePath;
-        }  catch (Html2PdfException $exception) {
+        } catch (Html2PdfException $exception) {
             throw new PdfGenerationException($exception->getMessage());
         }
     }
 
-    private function getSignEmoji(string $sign): string
+    private function getSignSymbol(string $sign): string
     {
         return match ($sign) {
-            'Aries' => '♈',
-            'Taurus' => '♉',
-            'Gemini' => '♊',
-            'Cancer' => '♋',
-            'Leo' => '♌',
-            'Virgo' => '♍',
-            'Libra' => '♎',
-            'Scorpio' => '♏',
-            'Sagittarius' => '♐',
-            'Capricorn' => '♑',
-            'Aquarius' => '♒',
-            'Pisces' => '♓',
-            default => '✦',
+            'Aries' => 'Y',
+            'Taurus' => 'V',
+            'Gemini' => 'II',
+            'Cancer' => '69',
+            'Leo' => 'SL',
+            'Virgo' => 'nP',
+            'Libra' => '=',
+            'Scorpio' => 'M~',
+            'Sagittarius' => '->',
+            'Capricorn' => 'Vq',
+            'Aquarius' => '~~',
+            'Pisces' => '><',
+            default => '*',
         };
     }
 }

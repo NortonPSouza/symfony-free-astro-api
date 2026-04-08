@@ -4,8 +4,8 @@
 	php_server {
 		worker {
 			file ./public/index.php
-		   	num 4
-			env FRANKENPHP_MAX_REQUESTS 1000
+			num 4
+			env FRANKENPHP_MAX_REQUESTS 5000
 			max_consecutive_failures 5
 		}
 	}

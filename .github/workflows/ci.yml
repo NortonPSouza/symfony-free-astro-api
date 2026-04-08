@@ -8,17 +8,20 @@ on:
 
 jobs:
   tests:
-    name: PHPUnit Tests
+    name: CI Tests
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and start all services
-        run: docker compose up -d --build --wait
+      - name: Build and start infrastructure services
+        run: docker compose up -d --build --wait astro db rabbitmq mongodb redis
 
       - name: Install composer dependencies
         run: docker compose exec -T astro composer install --no-interaction --prefer-dist
+
+      - name: Start consumer service
+        run: docker compose up -d consumer
 
       - name: Run database migrations
         run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction

@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start all services
+        run: docker compose up -d --build --wait
+
+      - name: Install composer dependencies
+        run: docker compose exec -T astro composer install --no-interaction --prefer-dist
+
+      - name: Run database migrations
+        run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Run integration tests with PHPUnit
+        run: docker compose exec -T astro php bin/phpunit --testdox
+
+      - name: Stop all services
+        if: always()
+        run: docker compose down

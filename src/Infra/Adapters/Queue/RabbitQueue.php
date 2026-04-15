@@ -2,24 +2,42 @@
 
 namespace App\Infra\Adapters\Queue;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
 abstract class RabbitQueue
 {
+    private ?AMQPStreamConnection $connection = null;
+    private ?AMQPChannel $channel = null;
 
     /**
      * @throws \Exception
      */
-    private function connection(): AMQPStreamConnection
+    private function getConnection(): AMQPStreamConnection
     {
-        return new AMQPStreamConnection(
-            host: $_ENV['AMQP_HOST'],
-            port: $_ENV['AMQP_PORT'],
-            user: $_ENV['AMQP_USERNAME'],
-            password: $_ENV['AMQP_PASSWORD']
-        );
+        if ($this->connection === null || !$this->connection->isConnected()) {
+            $this->connection = new AMQPStreamConnection(
+                host: $_ENV['AMQP_HOST'],
+                port: $_ENV['AMQP_PORT'],
+                user: $_ENV['AMQP_USERNAME'],
+                password: $_ENV['AMQP_PASSWORD']
+            );
+            $this->channel = null;
+        }
+        return $this->connection;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function getChannel(): AMQPChannel
+    {
+        if ($this->channel === null || !$this->channel->is_open()) {
+            $this->channel = $this->getConnection()->channel();
+        }
+        return $this->channel;
     }
 
     /**
@@ -27,8 +45,7 @@ abstract class RabbitQueue
      */
     protected function sender(string $message, string $queue, string $routeKey, array $header): void
     {
-        $connection = $this->connection();
-        $channel = $connection->channel();
+        $channel = $this->getChannel();
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
         $channel->queue_declare($queue, durable: true, auto_delete: false);
         $channel->queue_bind($queue, $queue, $routeKey);
@@ -37,8 +54,6 @@ abstract class RabbitQueue
             'application_headers' => new AMQPTable($header),
         ]);
         $channel->basic_publish($amqpMessage, exchange: $queue, routing_key: $routeKey);
-        $channel->close();
-        $connection->close();
     }
 
     /**
@@ -46,8 +61,7 @@ abstract class RabbitQueue
      */
     protected function receiver(string $queue, callable $callback): void
     {
-        $connection = $this->connection();
-        $channel = $connection->channel();
+        $channel = $this->getChannel();
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
         $channel->queue_declare($queue, durable: true, auto_delete: false);
         $channel->queue_bind($queue, $queue, $queue);
@@ -68,5 +82,16 @@ abstract class RabbitQueue
         while ($channel->is_consuming()) {
             $channel->wait();
         }
+    }
+
+
+    //TODO: explain this
+    /**
+     * @throws \Exception
+     */
+    public function __destruct()
+    {
+        $this->channel?->close();
+        $this->connection?->close();
     }
 }

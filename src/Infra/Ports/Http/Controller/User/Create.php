@@ -5,10 +5,6 @@ namespace App\Infra\Ports\Http\Controller\User;
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\Domain\Exceptions\InvalidParamsException;
-use App\Infra\Adapters\Database\ConnectionDoctrine;
-use App\Infra\Adapters\Encoder\BcryptPasswordEncoder;
-use App\Infra\Adapters\Repository\UserRepository;
-use App\Infra\Adapters\Repository\ZodiacRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,30 +15,20 @@ use Symfony\Component\Routing\Attribute\Route;
 final class Create extends AbstractController
 {
     public function __construct(
-        private readonly ConnectionDoctrine $connection,
+        private readonly CreateUserUseCase $createUserUseCase,
     )
     {
-        set_exception_handler(null);
     }
 
+    /**
+     * @throws InvalidParamsException
+     * @throws \DateMalformedStringException
+     */
     #[Route('', methods: [ 'POST' ])]
     public function create(Request $request): Response
     {
-        try {
-            $input = CreateUserInput::fromArray($request->request->all());
-        } catch (InvalidParamsException $exception) {
-            return new JsonResponse($exception->getData(), $exception->getStatusCode());
-        } catch (\DateMalformedStringException $exception) {
-            return new JsonResponse($exception->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
-        $userRepository = new UserRepository(connection: $this->connection);
-        $zodiacRepository = new ZodiacRepository(connection: $this->connection);
-        $createUserUseCase = new CreateUserUseCase(
-            userRepository: $userRepository,
-            zodiacRepository: $zodiacRepository
-        );
-        $passwordEncoder = new BcryptPasswordEncoder();
-        $output = $createUserUseCase->execute(input: $input, passwordEncoder: $passwordEncoder);
+        $input = CreateUserInput::fromArray($request->request->all());
+        $output = $this->createUserUseCase->execute(input: $input);
         return new JsonResponse($output->getData(), $output->getCode());
     }
 }

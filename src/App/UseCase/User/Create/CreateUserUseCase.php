@@ -15,19 +15,20 @@ readonly class CreateUserUseCase
 {
      public function __construct(
          private UserRepositoryInterface $userRepository,
-         private ZodiacRepositoryInterface $zodiacRepository
+         private ZodiacRepositoryInterface $zodiacRepository,
+         private PasswordEncoderInterface $passwordEncoder
      )
      {
      }
 
-    public function execute(CreateUserInput $input, PasswordEncoderInterface $passwordEncoder): CreateUserOutput
+    public function execute(CreateUserInput $input): CreateUserOutput
     {
         try {
             $user = User::create($input);
             $zodiacMapper = $this->zodiacRepository->getSignByBirth($input->getBirthDate());
             $zodiac = Zodiac::create($zodiacMapper->getId(), $zodiacMapper->getSign());
             $user->setZodiacSing($zodiac);
-            $user->setEncryptedPassword($passwordEncoder);
+            $user->setEncryptedPassword($this->passwordEncoder);
             $created = $this->userRepository->create($user);
             return CreateUserOutput::success($created);
         } catch (RepositoryException $exception) {

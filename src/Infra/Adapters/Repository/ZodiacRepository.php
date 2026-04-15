@@ -20,7 +20,6 @@ readonly class ZodiacRepository implements ZodiacRepositoryInterface
     /**
      * @throws RepositoryException
      */
-    // TODO: fix query for Capricorn - sign that crosses year boundary (start_date > end_date)
     public function getSignByBirth(\DateTime $birth): ZodiacDomain
     {
         try {
@@ -30,9 +29,19 @@ readonly class ZodiacRepository implements ZodiacRepositoryInterface
             $zodiac = $queryBuilder->select('z')
                 ->from(Zodiac::class, 'z')
                 ->where(
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->lte('z.startDate', ':monthDay'),
-                        $queryBuilder->expr()->gte('z.endDate', ':monthDay')
+                    $queryBuilder->expr()->orX(
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->lte('z.startDate', 'z.endDate'),
+                            $queryBuilder->expr()->lte('z.startDate', ':monthDay'),
+                            $queryBuilder->expr()->gte('z.endDate', ':monthDay')
+                        ),
+                        $queryBuilder->expr()->andX(
+                            $queryBuilder->expr()->gt('z.startDate', 'z.endDate'),
+                            $queryBuilder->expr()->orX(
+                                $queryBuilder->expr()->gte(':monthDay', 'z.startDate'),
+                                $queryBuilder->expr()->lte(':monthDay', 'z.endDate')
+                            )
+                        )
                     )
                 )
                 ->setParameter('monthDay', $monthDay)

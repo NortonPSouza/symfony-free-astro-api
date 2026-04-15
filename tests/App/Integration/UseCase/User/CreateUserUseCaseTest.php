@@ -27,7 +27,8 @@ class CreateUserUseCaseTest extends TestCase
 
         $this->useCase = new CreateUserUseCase(
             userRepository: $this->userRepository,
-            zodiacRepository: $this->zodiacRepository
+            zodiacRepository: $this->zodiacRepository,
+            passwordEncoder: $this->passwordEncoder
         );
     }
 
@@ -58,7 +59,7 @@ class CreateUserUseCaseTest extends TestCase
             ->method('create')
             ->willReturn(['id' => 'uuid-user-123']);
 
-        $output = $this->useCase->execute($input, $this->passwordEncoder);
+        $output = $this->useCase->execute($input);
 
         $this->assertEquals(201, $output->getCode());
         $this->assertEquals(['id' => 'uuid-user-123'], $output->getData());
@@ -90,7 +91,7 @@ class CreateUserUseCaseTest extends TestCase
             ->method('create')
             ->willThrowException(new RepositoryException('Duplicate entry'));
 
-        $output = $this->useCase->execute($input, $this->passwordEncoder);
+        $output = $this->useCase->execute($input);
 
         $this->assertEquals(500, $output->getCode());
     }

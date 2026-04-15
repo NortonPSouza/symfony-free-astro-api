@@ -2,13 +2,13 @@
 
 namespace App\App\UseCase\Report\Create;
 
+use App\App\Contracts\Gateway\EventProcessReportInterface;
 use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;
 use App\App\UseCase\Report\Create\Output\CreateReportOutput;
 use App\Domain\Entity\Report;
 use App\Domain\Exceptions\EventException;
 use App\Domain\Exceptions\NotFoundException;
-use App\Infra\Adapters\Gateway\EventProcessReport;
 use Doctrine\ORM\Exception\ORMException;
 
 readonly class CreateReportUseCase
@@ -16,7 +16,7 @@ readonly class CreateReportUseCase
 
     public function __construct(
         private ReportRepositoryInterface $reportRepository,
-        private EventProcessReport $eventProcessReport
+        private EventProcessReportInterface $eventProcessReport
     )
     {
     }

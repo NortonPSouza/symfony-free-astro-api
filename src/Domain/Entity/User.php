@@ -4,7 +4,6 @@ namespace App\Domain\Entity;
 
 use App\App\Contracts\Validation\ArraySerializationInterface;
 use App\App\Contracts\Validation\PasswordEncoderInterface;
-use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\Domain\ValueObjects\Email;
 use App\Domain\ValueObjects\Password;
 
@@ -22,20 +21,6 @@ class User implements ArraySerializationInterface
         private ?Zodiac $zodiac
     )
     {
-    }
-
-    static function create(CreateUserInput $user): User
-    {
-        return new User(
-            null,
-            $user->getName(),
-            $user->getFamilyName(),
-            Email::create($user->getEmail()),
-            Password::create($user->getPassword()),
-            $user->getBirthDate(),
-            $user->getBirthTime(),
-            null
-        );
     }
 
     public function setZodiacSing(Zodiac $sing): void

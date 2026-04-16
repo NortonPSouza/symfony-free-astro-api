@@ -5,9 +5,9 @@ namespace App\App\UseCase\User\Create;
 use App\App\Contracts\Repository\UserRepositoryInterface;
 use App\App\Contracts\Repository\ZodiacRepositoryInterface;
 use App\App\Contracts\Validation\PasswordEncoderInterface;
+use App\App\Factory\UserFactory;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\App\UseCase\User\Create\Output\CreateUserOutput;
-use App\Domain\Entity\User;
 use App\Domain\Entity\Zodiac;
 use App\Domain\Exceptions\GenericException;
 
@@ -24,7 +24,7 @@ readonly class CreateUserUseCase
     public function execute(CreateUserInput $input): CreateUserOutput
     {
         try {
-            $user = User::create($input);
+            $user = UserFactory::fromInput($input);
             $zodiacMapper = $this->zodiacRepository->getSignByBirth($input->getBirthDate());
             $zodiac = Zodiac::create($zodiacMapper->getId(), $zodiacMapper->getSign());
             $user->setZodiacSing($zodiac);

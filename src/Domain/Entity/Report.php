@@ -3,9 +3,6 @@
 namespace App\Domain\Entity;
 
 
-use App\App\UseCase\Report\Create\Input\CreateReportInput;
-use App\Domain\Types\ReportStatus;
-
 class Report
 {
 
@@ -18,18 +15,6 @@ class Report
         private ?\DateTime $requestedAt
     )
     {
-    }
-
-    static public function create(CreateReportInput $input): Report
-    {
-        return new Report(
-            $input->getUserId(),
-            $input->getMonth(),
-            $input->getYear(),
-            ReportStatus::PENDING->getStatus(),
-            null,
-            null
-        );
     }
 
     public function getUserId(): string

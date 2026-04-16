@@ -4,7 +4,7 @@ namespace App\Domain\ValueObjects;
 
 use App\Domain\Exceptions\InvalidParamsException;
 
-final readonly class Email
+readonly class Email
 {
     private function __construct(private string $value) {}
 

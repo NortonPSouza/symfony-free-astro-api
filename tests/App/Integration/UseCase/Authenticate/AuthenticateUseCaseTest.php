@@ -11,6 +11,8 @@ use App\App\UseCase\Authenticate\Input\AuthenticateInput;
 use App\Domain\Entity\Session;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\InvalidParamsException;
+use App\Domain\ValueObjects\Email;
+use App\Domain\ValueObjects\Password;
 use App\Domain\ValueObjects\Token;
 use PHPUnit\Framework\TestCase;
 
@@ -43,8 +45,8 @@ class AuthenticateUseCaseTest extends TestCase
             'uuid-123',
             'John',
             'Doe',
-            'john@example.com',
-            '$2y$10$hashedpassword',
+            Email::create('john@example.com'),
+            Password::fromHash('$2y$10$hashedpassword'),
             new \DateTime('1990-05-15'),
             null,
             null

@@ -34,7 +34,7 @@ readonly class AuthenticateUseCase
                 $session->validateRefreshToken($input->getRefreshToken());
             } else {
                 $user = $this->userRepository->findByEmail($input->getEmail());
-                $this->passwordEncoder->verify($input->getPassword(), $user->getPassword());
+                $this->passwordEncoder->verify($input->getPassword(), $user->getPassword()->getValue());
             }
             $refreshToken = $this->tokenManager->generate($user, LifeTimeToken::SEVEN_DAYS->getSeconds());
             $accessToken = $this->tokenManager->generate($user, LifeTimeToken::FIFTEEN_MINUTES->getSeconds());

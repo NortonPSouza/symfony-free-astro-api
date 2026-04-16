@@ -2,6 +2,7 @@
 
 namespace App\Infra\Mappers;
 use App\Domain\Entity\User as UserDomain;
+use App\Domain\ValueObjects\Email;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -125,7 +126,7 @@ class User
             $this->getId(),
             $this->getName(),
             $this->getFamilyName(),
-            $this->getEmail(),
+            Email::create($this->getEmail()),
             null,
             $this->getBirthDate(),
             $this->getBirthTime(),

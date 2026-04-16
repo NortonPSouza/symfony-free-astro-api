@@ -30,15 +30,15 @@ readonly class UserRepository implements UserRepositoryInterface
             $userMapper
                 ->setName($user->getName())
                 ->setFamilyName($user->getFamilyName())
-                ->setEmail($user->getEmail())
+                ->setEmail($user->getEmail()->getValue())
                 ->setBirthDate($user->getBirthDate())
                 ->setBirthTime($user->getBirthTime())
                 ->setZodiac($zodiacMapper);
             $entityManager->persist($userMapper);
             $loginMapper = new Login();
             $loginMapper
-                ->setEmail($user->getEmail())
-                ->setPassword($user->getPassword());
+                ->setEmail($user->getEmail()->getValue())
+                ->setPassword($user->getPassword()->getValue());
             $entityManager->persist($loginMapper);
             $loginUserMapper = new LoginUser();
             $loginUserMapper
@@ -83,7 +83,7 @@ readonly class UserRepository implements UserRepositoryInterface
                 throw new NotFoundException("Login not Found");
             }
             $userDomain = $userMapper->toDomain();
-            $userDomain->setPassword($loginMapper->getPassword());
+            $userDomain->setPassword(\App\Domain\ValueObjects\Password::fromHash($loginMapper->getPassword()));
             return $userDomain;
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());

@@ -7,6 +7,7 @@ use App\App\UseCase\User\Find\FindUserUseCase;
 use App\App\UseCase\User\Find\Input\FindUserInput;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;
+use App\Domain\ValueObjects\Email;
 use PHPUnit\Framework\TestCase;
 
 class FindUserUseCaseTest extends TestCase
@@ -26,7 +27,7 @@ class FindUserUseCaseTest extends TestCase
             'uuid-123',
             'John',
             'Doe',
-            'john@example.com',
+            Email::create('john@example.com'),
             null,
             new \DateTime('1990-05-15'),
             null,

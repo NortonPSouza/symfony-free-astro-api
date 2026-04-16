@@ -5,18 +5,20 @@ namespace App\Domain\Entity;
 use App\App\Contracts\Validation\ArraySerializationInterface;
 use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
+use App\Domain\ValueObjects\Email;
+use App\Domain\ValueObjects\Password;
 
 class User implements ArraySerializationInterface
 {
 
     public function __construct(
-        private ?string $id,
-        private string $name,
-        private string $familyName,
-        private string $email,
-        private ?string $password,
-        private \DateTime $birthDate,
-        private ?\DateTime $birthTime,
+        private readonly ?string $id,
+        private readonly string $name,
+        private readonly string $familyName,
+        private readonly Email $email,
+        private ?Password $password,
+        private readonly \DateTime $birthDate,
+        private readonly ?\DateTime $birthTime,
         private ?Zodiac $zodiac
     )
     {
@@ -28,8 +30,8 @@ class User implements ArraySerializationInterface
             null,
             $user->getName(),
             $user->getFamilyName(),
-            $user->getEmail(),
-            $user->getPassword(),
+            Email::create($user->getEmail()),
+            Password::create($user->getPassword()),
             $user->getBirthDate(),
             $user->getBirthTime(),
             null
@@ -43,7 +45,7 @@ class User implements ArraySerializationInterface
 
     public function setEncryptedPassword(PasswordEncoderInterface $passwordEncoder): void
     {
-        $this->password = $passwordEncoder->encode($this->password);
+        $this->password = Password::fromHash($passwordEncoder->encode($this->password->getValue()));
     }
 
     public function getId(): ?string
@@ -61,17 +63,17 @@ class User implements ArraySerializationInterface
         return $this->familyName;
     }
 
-    public function getEmail(): string
+    public function getEmail(): Email
     {
         return $this->email;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): ?Password
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(Password $password): void
     {
         $this->password = $password;
     }

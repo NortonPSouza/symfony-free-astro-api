@@ -7,6 +7,7 @@ use App\App\UseCase\User\Delete\DeleteUserUseCase;
 use App\App\UseCase\User\Delete\Input\DeleteUserInput;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;
+use App\Domain\ValueObjects\Email;
 use PHPUnit\Framework\TestCase;
 
 class DeleteUserUseCaseTest extends TestCase
@@ -26,7 +27,7 @@ class DeleteUserUseCaseTest extends TestCase
             'uuid-123',
             'John',
             'Doe',
-            'john@example.com',
+            Email::create('john@example.com'),
             null,
             new \DateTime('1990-05-15'),
             null,

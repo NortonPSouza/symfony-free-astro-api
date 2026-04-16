@@ -2,12 +2,14 @@
 
 namespace App\Domain\ValueObjects;
 
-final readonly class Token
+readonly class Token
 {
     public function __construct(
         private string $token,
         private int $expiresIn,
-    ) {}
+    )
+    {
+    }
 
     public function getToken(): string
     {

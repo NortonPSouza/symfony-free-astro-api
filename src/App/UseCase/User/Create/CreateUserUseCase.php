@@ -9,7 +9,7 @@ use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\App\UseCase\User\Create\Output\CreateUserOutput;
 use App\Domain\Entity\User;
 use App\Domain\Entity\Zodiac;
-use App\Domain\Exceptions\RepositoryException;
+use App\Domain\Exceptions\GenericException;
 
 readonly class CreateUserUseCase
 {
@@ -31,7 +31,7 @@ readonly class CreateUserUseCase
             $user->setEncryptedPassword($this->passwordEncoder);
             $created = $this->userRepository->create($user);
             return CreateUserOutput::success($created);
-        } catch (RepositoryException $exception) {
+        } catch (GenericException $exception) {
             return CreateUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }
     }

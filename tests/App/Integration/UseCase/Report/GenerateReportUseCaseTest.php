@@ -12,6 +12,7 @@ use App\Domain\Entity\Report;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\PdfGenerationException;
 use App\Domain\Types\ReportStatus;
+use App\Domain\ValueObjects\Email;
 use PHPUnit\Framework\TestCase;
 
 class GenerateReportUseCaseTest extends TestCase
@@ -55,7 +56,7 @@ class GenerateReportUseCaseTest extends TestCase
             'uuid-user-123',
             'John',
             'Doe',
-            'john@example.com',
+            Email::create('john@example.com'),
             null,
             new \DateTime('1990-05-15'),
             null,

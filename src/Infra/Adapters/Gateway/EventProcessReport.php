@@ -3,12 +3,16 @@
 namespace App\Infra\Adapters\Gateway;
 
 use App\App\Contracts\Gateway\EventProcessReportInterface;
+use App\App\Contracts\Gateway\QueueInterface;
 use App\Domain\Entity\Report;
 use App\Domain\Exceptions\EventException;
-use App\Infra\Adapters\Queue\RabbitQueue;
 
-class EventProcessReport extends RabbitQueue implements EventProcessReportInterface
+readonly class EventProcessReport implements EventProcessReportInterface
 {
+    public function __construct(
+        private QueueInterface $queue
+    ) {
+    }
 
     public function execute(Report $report): void
     {
@@ -22,7 +26,7 @@ class EventProcessReport extends RabbitQueue implements EventProcessReportInterf
                 "requested_at" => $report->getRequestedAt()->format('Y-m-d\TH:i:sP'),
                 "completed_at" => null
             ];
-            $this->sender(
+            $this->queue->sender(
                 message: json_encode($payload),
                 queue: "horoscope.monthly.report",
                 routeKey: "horoscope.monthly.report",
@@ -31,6 +35,5 @@ class EventProcessReport extends RabbitQueue implements EventProcessReportInterf
         } catch (\Exception $exception) {
             throw new EventException($exception->getMessage());
         }
-
     }
 }

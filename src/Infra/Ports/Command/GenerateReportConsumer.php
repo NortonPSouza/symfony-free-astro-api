@@ -2,16 +2,21 @@
 
 namespace App\Infra\Ports\Command;
 
-use App\Infra\Adapters\Queue\RabbitQueue;
+use App\App\Contracts\Gateway\QueueInterface;
 
-final class GenerateReportConsumer extends RabbitQueue
+readonly class GenerateReportConsumer
 {
+    public function __construct(
+        private QueueInterface $queue
+    ) {
+    }
+
     /**
      * @throws \Exception
      */
     public function listen(callable $callback): void
     {
-        $this->receiver('horoscope.monthly.report', function (array $payload) use ($callback){
+        $this->queue->consume('horoscope.monthly.report', function (array $payload) use ($callback) {
             $callback($payload);
         });
     }

@@ -2,12 +2,13 @@
 
 namespace App\Infra\Adapters\Queue;
 
+use App\App\Contracts\Gateway\QueueInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-abstract class RabbitQueue
+class RabbitQueue implements QueueInterface
 {
     private ?AMQPStreamConnection $connection = null;
     private ?AMQPChannel $channel = null;
@@ -43,7 +44,7 @@ abstract class RabbitQueue
     /**
      * @throws \Exception
      */
-    protected function sender(string $message, string $queue, string $routeKey, array $header): void
+    public function sender(string $message, string $queue, string $routeKey, array $header): void
     {
         $channel = $this->getChannel();
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
@@ -59,7 +60,7 @@ abstract class RabbitQueue
     /**
      * @throws \Exception
      */
-    protected function receiver(string $queue, callable $callback): void
+    public function consume(string $queue, callable $callback): void
     {
         $channel = $this->getChannel();
         $channel->exchange_declare($queue, type: 'direct', durable: true, auto_delete: false);
@@ -84,8 +85,6 @@ abstract class RabbitQueue
         }
     }
 
-
-    //TODO: explain this
     /**
      * @throws \Exception
      */

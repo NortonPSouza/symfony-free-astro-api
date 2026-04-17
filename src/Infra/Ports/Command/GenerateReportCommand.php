@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Infra\Ports\Command;
-//
+
 use App\App\Contracts\Database\ConnectionInterface;
 use App\App\UseCase\Report\Generate\GenerateReportUseCase;
 use App\App\UseCase\Report\Generate\Input\GenerateReportInput;
@@ -18,6 +18,7 @@ class GenerateReportCommand extends Command
 {
     public function __construct(
         private readonly GenerateReportUseCase $generateReportUseCase,
+        private readonly GenerateReportConsumer $generateReportConsumer,
         private readonly ConnectionInterface $connection
     ) {
         parent::__construct();
@@ -28,10 +29,8 @@ class GenerateReportCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         $output->writeln('<info>Report consumer started...</info>');
-        $generateReportConsumer = new GenerateReportConsumer();
-        $generateReportConsumer->listen(function (array $payload) use ($output) {
+        $this->generateReportConsumer->listen(function (array $payload) use ($output) {
             $this->connection->clear();
             $generateReportInput = new GenerateReportInput($payload['process_id']);
             $result = $this->generateReportUseCase->execute($generateReportInput);

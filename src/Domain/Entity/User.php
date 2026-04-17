@@ -3,7 +3,6 @@
 namespace App\Domain\Entity;
 
 use App\App\Contracts\Validation\ArraySerializationInterface;
-use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\Domain\ValueObjects\Email;
 use App\Domain\ValueObjects\Password;
 
@@ -18,20 +17,11 @@ class User implements ArraySerializationInterface
         private ?Password $password,
         private readonly \DateTime $birthDate,
         private readonly ?\DateTime $birthTime,
-        private ?Zodiac $zodiac
+        private readonly ?Zodiac $zodiac
     )
     {
     }
 
-    public function setZodiacSing(Zodiac $sing): void
-    {
-        $this->zodiac = $sing;
-    }
-
-    public function setEncryptedPassword(PasswordEncoderInterface $passwordEncoder): void
-    {
-        $this->password = Password::fromHash($passwordEncoder->encode($this->password->getValue()));
-    }
 
     public function getId(): ?string
     {

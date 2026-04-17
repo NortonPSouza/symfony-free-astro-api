@@ -10,16 +10,11 @@ use App\Infra\Mappers\Zodiac;
 
 readonly class ZodiacRepository implements ZodiacRepositoryInterface
 {
-
     public function __construct(
         private ConnectionDoctrine $connection,
-    )
-    {
+    ) {
     }
 
-    /**
-     * @throws RepositoryException
-     */
     public function getSignByBirth(\DateTime $birth): ZodiacDomain
     {
         try {

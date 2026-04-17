@@ -4,9 +4,9 @@ namespace App\App\UseCase\Report\Create;
 
 use App\App\Contracts\Gateway\EventProcessReportInterface;
 use App\App\Contracts\Repository\ReportRepositoryInterface;
-use App\App\Factory\ReportFactory;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;
 use App\App\UseCase\Report\Create\Output\CreateReportOutput;
+use App\Domain\Builder\ReportBuilder;
 use App\Domain\Exceptions\EventException;
 use App\Domain\Exceptions\NotFoundException;
 use Doctrine\ORM\Exception\ORMException;
@@ -24,7 +24,11 @@ readonly class CreateReportUseCase
     public function execute(CreateReportInput $input): CreateReportOutput
     {
         try {
-            $report = ReportFactory::fromInput($input);
+            $report = (new ReportBuilder())
+                ->withUserId($input->getUserId())
+                ->withMonth($input->getMonth())
+                ->withYear($input->getYear())
+                ->build();
             $created = $this->reportRepository->create($report);
             $this->eventProcessReport->execute($created);
             return CreateReportOutput::success(['id' => $created->getProcessId()]);

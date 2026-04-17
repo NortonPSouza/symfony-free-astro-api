@@ -11,20 +11,14 @@ use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Mappers\Report as ReportMapper;
 use App\Infra\Mappers\ReportStatus;
 use App\Infra\Mappers\User;
-use Doctrine\ORM\Exception\ORMException;
 
 readonly class ReportRepository implements ReportRepositoryInterface
 {
-
     public function __construct(
         private ConnectionDoctrine $connection
-    )
-    {
+    ) {
     }
 
-    /**
-     * @throws RepositoryException
-     */
     public function create(Report $report): Report
     {
         try {
@@ -32,9 +26,6 @@ readonly class ReportRepository implements ReportRepositoryInterface
             $reportStatusMapper = $entityManager->getRepository(ReportStatus::class)
                 ->find($report->getStatus());
             $userMapper = $entityManager->getReference(User::class, $report->getUserId());
-            if (!$userMapper) {
-                throw new NotFoundException("user not found");
-            }
             $reportMapper = new ReportMapper();
             $reportMapper
                 ->setUser($userMapper)
@@ -46,11 +37,10 @@ readonly class ReportRepository implements ReportRepositoryInterface
             $report->setProcessId($reportMapper->getId())
                 ->setRequestedAt($reportMapper->getRequestedAt());
             return $report;
-        } catch (ORMException|NotFoundException $exception) {
+        } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
     }
-
 
     public function updateStatus(string $reportId, ReportStatusType $status): Report
     {
@@ -58,15 +48,21 @@ readonly class ReportRepository implements ReportRepositoryInterface
             $entityManager = $this->connection->getEntityManager();
             $reportStatusMapper = $entityManager->getReference(ReportStatus::class, $status->getStatus());
             $reportMapper = $entityManager->getRepository(ReportMapper::class)->find($reportId);
-            $reportMapper
-                ->setStatus($reportStatusMapper);
+        } catch (\Exception $exception) {
+            throw new RepositoryException($exception->getMessage());
+        }
+        if (!$reportMapper) {
+            throw new NotFoundException("Report not found");
+        }
+        try {
+            $reportMapper->setStatus($reportStatusMapper);
             if ($status === ReportStatusType::COMPLETED) {
                 $reportMapper->setCompletedAt(new \DateTime());
             }
             $entityManager->persist($reportMapper);
             $entityManager->flush();
             return $reportMapper->toDomain();
-        } catch (ORMException $exception) {
+        } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
     }
@@ -76,12 +72,12 @@ readonly class ReportRepository implements ReportRepositoryInterface
         try {
             $entityManager = $this->connection->getEntityManager();
             $reportMapper = $entityManager->getRepository(ReportMapper::class)->find($reportId);
-            if (!$reportMapper) {
-                throw new NotFoundException("report not found");
-            }
-            return $reportMapper->toDomain();
-        } catch (NotFoundException $exception) {
+        } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
+        if (!$reportMapper) {
+            throw new NotFoundException("Report not found");
+        }
+        return $reportMapper->toDomain();
     }
 }

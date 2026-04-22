@@ -9,7 +9,7 @@ class ReportStatus
 {
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: 'integer', length: 8)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private int $id;
 
     #[ORM\Column(name: 'description', type: 'string', length: 16, nullable: false)]
@@ -20,9 +20,21 @@ class ReportStatus
         return $this->id;
     }
 
+    public function setId(int $id): ReportStatus
+    {
+        $this->id = $id;
+        return $this;
+    }
+
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function setDescription(string $description): ReportStatus
+    {
+        $this->description = $description;
+        return $this;
     }
 
 }

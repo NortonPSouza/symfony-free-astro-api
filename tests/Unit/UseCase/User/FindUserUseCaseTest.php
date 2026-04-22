@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\App\Integration\UseCase\User;
+namespace App\Tests\Unit\UseCase\User;
 
 use App\App\Contracts\Repository\UserRepositoryInterface;
 use App\App\UseCase\User\Find\FindUserUseCase;

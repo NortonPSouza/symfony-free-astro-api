@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\App\Integration\UseCase\Authenticate;
+namespace App\Tests\Unit\UseCase\Authenticate;
 
 use App\App\Contracts\Gateway\TokenManagerInterface;
 use App\App\Contracts\Memory\TokenMemoryInterface;

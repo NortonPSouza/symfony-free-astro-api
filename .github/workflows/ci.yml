@@ -7,40 +7,91 @@ on:
         branches: [main]
 
 jobs:
-    push_tests:
-        name: CI Tests
+    unit_tests:
+        name: Unit Tests
         runs-on: ubuntu-latest
-        
+
         steps:
             - uses: actions/checkout@v5
-            
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+
+            - name: Install composer dependencies
+              run: composer install --no-interaction --prefer-dist
+
+            - name: Run unit tests
+              run: php bin/phpunit --testsuite unit --testdox
+
+    integration_tests:
+        name: Integration Tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v5
+
             - name: Build and start infrastructure services
               run: docker compose up -d --build --wait astro db rabbitmq mongodb redis
-            
+
             - name: Install composer dependencies
               run: docker compose exec -T astro composer install --no-interaction --prefer-dist
-            
-            - name: Start consumer service
-              run: docker compose up -d consumer
-            
+
+            - name: Create test database
+              run: |
+                  docker compose exec -T db mysql -uroot -prootpassword -e "
+                  CREATE DATABASE IF NOT EXISTS free_astro_test;
+                  GRANT ALL PRIVILEGES ON free_astro_test.* TO 'fen_user'@'%';
+                  FLUSH PRIVILEGES;
+                  "
+
             - name: Run database migrations
-              run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction
-            
-            - name: Run integration tests with PHPUnit
-              run: docker compose exec -T astro php bin/phpunit --testdox
-            
+              run: docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+            - name: Seed zodiac data
+              run: |
+                  docker compose exec -T db mysql -ufen_user -pfen_password free_astro_test -e "
+                  INSERT INTO zodiac (id, sign, start_date, end_date) VALUES
+                  (UUID_TO_BIN(UUID()), 'Aries',       '2000-03-21', '2000-04-19'),
+                  (UUID_TO_BIN(UUID()), 'Taurus',      '2000-04-20', '2000-05-20'),
+                  (UUID_TO_BIN(UUID()), 'Gemini',      '2000-05-21', '2000-06-20'),
+                  (UUID_TO_BIN(UUID()), 'Cancer',      '2000-06-21', '2000-07-22'),
+                  (UUID_TO_BIN(UUID()), 'Leo',         '2000-07-23', '2000-08-22'),
+                  (UUID_TO_BIN(UUID()), 'Virgo',       '2000-08-23', '2000-09-22'),
+                  (UUID_TO_BIN(UUID()), 'Libra',       '2000-09-23', '2000-10-22'),
+                  (UUID_TO_BIN(UUID()), 'Scorpio',     '2000-10-23', '2000-11-21'),
+                  (UUID_TO_BIN(UUID()), 'Sagittarius', '2000-11-22', '2000-12-21'),
+                  (UUID_TO_BIN(UUID()), 'Capricorn',   '2000-12-22', '2000-01-19'),
+                  (UUID_TO_BIN(UUID()), 'Aquarius',    '2000-01-20', '2000-02-18'),
+                  (UUID_TO_BIN(UUID()), 'Pisces',      '2000-02-19', '2000-03-20');
+                  "
+
+            - name: Seed report status data
+              run: |
+                  docker compose exec -T db mysql -ufen_user -pfen_password free_astro_test -e "
+                  INSERT INTO report_status (id, description) VALUES
+                  (1, 'PENDING'),
+                  (2, 'PROCESSING'),
+                  (3, 'COMPLETED'),
+                  (4, 'FAILURE');
+                  "
+
+            - name: Run integration tests
+              run: docker compose exec -T astro php bin/phpunit --testsuite integration --testdox
+
             - name: Stop all services
               if: always()
               run: docker compose down
-    
+
     build_deploy:
         name: CD Build Image
         runs-on: ubuntu-latest
-        needs: push_tests
+        needs: [unit_tests, integration_tests]
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        
+
         steps:
             - uses: actions/checkout@v5
-            
+
             - name: Build production image
               run: docker build -t astro-app:${{ github.sha }} ./local

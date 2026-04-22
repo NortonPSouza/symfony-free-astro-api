@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\App\Integration\UseCase\Report;
+namespace App\Tests\Unit\UseCase\Report;
 
 use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\App\UseCase\Report\Create\CreateReportUseCase;

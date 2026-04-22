@@ -12,66 +12,38 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
+
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.4'
+
             - name: Cache composer dependencies
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: vendor
                   key: composer-${{ hashFiles('composer.lock') }}
                   restore-keys: composer-
+
             - name: Install composer dependencies
-              run: composer install --no-interaction --prefer-dist
+              run: composer install --no-interaction --prefer-dist --no-progress
+
             - name: Run unit tests
               run: php bin/phpunit --testsuite unit --testdox
+
     integration_tests:
         name: Integration Tests
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
 
-            - name: Cache Docker layers
-              uses: actions/cache@v4
-              with:
-                  path: /tmp/.buildx-cache
-                  key: docker-${{ hashFiles('local/Dockerfile') }}
-                  restore-keys: docker-
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-
-            - name: Build app image with cache
-              uses: docker/build-push-action@v6
-              with:
-                  context: ./local
-                  load: true
-                  tags: php:public
-                  cache-from: type=local,src=/tmp/.buildx-cache
-                  cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-            - name: Move cache
-              run: |
-                  rm -rf /tmp/.buildx-cache
-                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
             - name: Start services
-              run: docker compose up -d --wait astro db redis
+              run: docker compose up -d --build --wait astro db redis
 
-            - name: Install composer dependencies
-              run: docker compose exec -T astro composer install --no-interaction --prefer-dist
-
-            - name: Create test database
+            - name: Install dependencies and setup database
               run: |
-                  docker compose exec -T db mysql -uroot -prootpassword -e "
-                  CREATE DATABASE IF NOT EXISTS free_astro_test;
-                  GRANT ALL PRIVILEGES ON free_astro_test.* TO 'fen_user'@'%';
-                  FLUSH PRIVILEGES;
-                  "
-
-            - name: Run migrations and seed
-              run: |
+                  docker compose exec -T astro composer install --no-interaction --prefer-dist --no-progress
+                  docker compose exec -T db mysql -uroot -prootpassword -e "CREATE DATABASE IF NOT EXISTS free_astro_test; GRANT ALL PRIVILEGES ON free_astro_test.* TO 'fen_user'@'%'; FLUSH PRIVILEGES;"
                   docker compose exec -T astro php bin/console doctrine:migrations:migrate --no-interaction --env=test
                   docker compose exec -T astro php bin/console app:seed --env=test
 

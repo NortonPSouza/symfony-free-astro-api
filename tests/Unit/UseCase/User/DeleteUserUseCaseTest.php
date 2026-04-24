@@ -44,7 +44,7 @@ class DeleteUserUseCaseTest extends TestCase
             ->expects($this->once())
             ->method('delete')
             ->with($user)
-            ->willReturn(['id' => 'uuid-123']);
+            ->willReturn($user);
 
         $input = DeleteUserInput::fromArray('uuid-123');
         $output = $this->useCase->execute($input);

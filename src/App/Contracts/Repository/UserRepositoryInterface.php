@@ -34,9 +34,9 @@ interface UserRepositoryInterface
 
     /**
      * @param User $user
-     * @return array
+     * @return User
      * @throws RepositoryException
      */
-    public function delete(User $user): array;
+    public function delete(User $user): User;
 
 }

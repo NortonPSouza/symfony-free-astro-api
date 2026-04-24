@@ -24,6 +24,10 @@ final readonly class ExceptionListener
             $event->setResponse(
                 new JsonResponse(['exception' => $exception->getMessage()], JsonResponse::HTTP_BAD_REQUEST)
             );
+            return;
         }
+        $event->setResponse(
+            new JsonResponse(['exception' => 'Internal server error'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR)
+        );
     }
 }

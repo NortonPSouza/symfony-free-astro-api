@@ -11,8 +11,8 @@ class Report
         private readonly int $month,
         private readonly int $year,
         private readonly int $status,
-        private ?string $processId,
-        private ?\DateTime $requestedAt
+        private readonly ?string $processId,
+        private readonly ?\DateTime $requestedAt
     )
     {
     }
@@ -42,21 +42,9 @@ class Report
         return $this->processId;
     }
 
-    public function setProcessId(?string $processId): Report
-    {
-        $this->processId = $processId;
-        return $this;
-    }
-
-    public function getRequestedAt(): ?\dateTime
+    public function getRequestedAt(): ?\DateTime
     {
         return $this->requestedAt;
-    }
-
-    public function setRequestedAt(?\DateTime $requestedAt): Report
-    {
-        $this->requestedAt = $requestedAt;
-        return $this;
     }
 
     public static function fromPrimitives(

@@ -22,7 +22,7 @@ readonly class DeleteUserUseCase
         try {
             $user = $this->userRepository->find($input->getId());
             $deleted = $this->userRepository->delete($user);
-            return DeleteUserOutput::success($deleted);
+            return DeleteUserOutput::success(['id' => $deleted->getId()]);
         } catch (RepositoryException|NotFoundException $exception) {
             return DeleteUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }

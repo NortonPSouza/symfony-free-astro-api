@@ -2,7 +2,6 @@
 
 namespace App\Domain\Builder;
 
-use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\Domain\Entity\User;
 use App\Domain\Entity\Zodiac;
 use App\Domain\ValueObjects\Email;
@@ -43,9 +42,9 @@ class UserBuilder
         return $this;
     }
 
-    public function withEncryptedPassword(PasswordEncoderInterface $encoder): self
+    public function withHashedPassword(string $hash): self
     {
-        $this->password = Password::fromHash($encoder->encode($this->password->getValue()));
+        $this->password = Password::fromHash($hash);
         return $this;
     }
 

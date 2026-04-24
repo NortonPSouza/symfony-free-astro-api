@@ -3,7 +3,7 @@
 namespace App\Infra\Adapters\Gateway;
 
 use App\App\Contracts\Gateway\PdfGeneratorInterface;
-use App\App\Contracts\Repository\FortuneProviderInterface;
+use App\App\Contracts\Gateway\FortuneProviderInterface;
 use App\Domain\Entity\Report;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\PdfGenerationException;

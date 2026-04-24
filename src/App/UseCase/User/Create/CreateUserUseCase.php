@@ -24,12 +24,12 @@ readonly class CreateUserUseCase
     {
         try {
             $zodiac = $this->zodiacRepository->getSignByBirth($input->getBirthDate());
+            $hashedPassword = $this->passwordEncoder->encode($input->getPassword());
             $user = new UserBuilder()
                 ->withName($input->getName())
                 ->withFamilyName($input->getFamilyName())
                 ->withEmail($input->getEmail())
-                ->withPassword($input->getPassword())
-                ->withEncryptedPassword($this->passwordEncoder)
+                ->withHashedPassword($hashedPassword)
                 ->withBirthDate($input->getBirthDate())
                 ->withBirthTime($input->getBirthTime())
                 ->withZodiac($zodiac)

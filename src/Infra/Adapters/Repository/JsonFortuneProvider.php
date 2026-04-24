@@ -2,7 +2,7 @@
 
 namespace App\Infra\Adapters\Repository;
 
-use App\App\Contracts\Repository\FortuneProviderInterface;
+use App\App\Contracts\Gateway\FortuneProviderInterface;
 
 readonly class JsonFortuneProvider implements FortuneProviderInterface
 {

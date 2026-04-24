@@ -11,10 +11,11 @@ abstract class GenericOutput implements \JsonSerializable
         private readonly string $path,
         private readonly array $data,
         private readonly int $code,
+        string $timezone = 'UTC'
     )
     {
         $this->time = new \DateTime();
-        $this->time->setTimezone(new \DateTimeZone('America/Sao_Paulo'));
+        $this->time->setTimezone(new \DateTimeZone($timezone));
     }
 
     public function getTitle(): string

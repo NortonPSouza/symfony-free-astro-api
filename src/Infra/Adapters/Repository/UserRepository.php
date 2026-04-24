@@ -114,7 +114,7 @@ readonly class UserRepository implements UserRepositoryInterface
         return $userDomain;
     }
 
-    public function delete(User $user): array
+    public function delete(User $user): User
     {
         try {
             $entityManager = $this->connection->getEntityManager();
@@ -126,10 +126,19 @@ readonly class UserRepository implements UserRepositoryInterface
             throw new NotFoundException("User not Found");
         }
         try {
-            $userId = ['id' => $userMapper->getId()];
+            $deleted = User::fromPrimitives(
+                $userMapper->getId(),
+                $userMapper->getName(),
+                $userMapper->getFamilyName(),
+                $userMapper->getEmail(),
+                $userMapper->getBirthDate(),
+                $userMapper->getBirthTime(),
+                $userMapper->getZodiac()?->getId(),
+                $userMapper->getZodiac()?->getSign()
+            );
             $entityManager->remove($userMapper);
             $entityManager->flush();
-            return $userId;
+            return $deleted;
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }

@@ -7,6 +7,7 @@ use App\App\Contracts\Repository\ZodiacRepositoryInterface;
 use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
+use App\Domain\Entity\User;
 use App\Domain\Entity\Zodiac;
 use App\Domain\Exceptions\InvalidParamsException;
 use App\Domain\Exceptions\RepositoryException;
@@ -57,7 +58,13 @@ class CreateUserUseCaseTest extends TestCase
         $this->userRepository
             ->expects($this->once())
             ->method('create')
-            ->willReturn(['id' => 'uuid-user-123']);
+            ->willReturn(User::fromPrimitives(
+                'uuid-user-123',
+                'John',
+                'Doe',
+                'john@example.com',
+                new \DateTime('1990-05-15')
+            ));
 
         $output = $this->useCase->execute($input);
 

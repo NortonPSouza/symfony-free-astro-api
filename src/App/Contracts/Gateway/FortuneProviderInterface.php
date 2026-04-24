@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\Contracts\Repository;
+namespace App\App\Contracts\Gateway;
 
 interface FortuneProviderInterface
 {

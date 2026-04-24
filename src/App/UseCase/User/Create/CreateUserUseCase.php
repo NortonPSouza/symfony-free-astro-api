@@ -8,7 +8,6 @@ use App\App\Contracts\Validation\PasswordEncoderInterface;
 use App\App\UseCase\User\Create\Input\CreateUserInput;
 use App\App\UseCase\User\Create\Output\CreateUserOutput;
 use App\Domain\Builder\UserBuilder;
-use App\Domain\Entity\Zodiac;
 use App\Domain\Exceptions\GenericException;
 
 readonly class CreateUserUseCase
@@ -36,7 +35,7 @@ readonly class CreateUserUseCase
                 ->withZodiac($zodiac)
                 ->build();
             $created = $this->userRepository->create($user);
-            return CreateUserOutput::success($created);
+            return CreateUserOutput::success(['id' => $created->getId()]);
         } catch (GenericException $exception) {
             return CreateUserOutput::failure($exception->getStatusCode(), $exception->getData());
         }

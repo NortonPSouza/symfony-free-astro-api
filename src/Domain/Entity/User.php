@@ -78,4 +78,22 @@ class User implements ArraySerializationInterface
             "birth_time" => $this->getBirthTime()
         ];
     }
+
+    public static function fromPrimitives(
+        ?string $id,
+        string $name,
+        string $familyName,
+        string $email,
+        \DateTime $birthDate,
+        ?\DateTime $birthTime = null,
+        ?string $zodiacId = null,
+        ?string $zodiacSign = null,
+        ?Password $password = null
+    ): User
+    {
+        $zodiac = $zodiacId && $zodiacSign
+            ? Zodiac::create($zodiacId, $zodiacSign)
+            : null;
+        return new User($id, $name, $familyName, Email::create($email), $password, $birthDate, $birthTime, $zodiac);
+    }
 }

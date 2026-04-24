@@ -39,7 +39,7 @@ class ReportRepositoryTest extends IntegrationTestCase
             ->withZodiac($zodiac)
             ->build();
         $created = $this->userRepository->create($user);
-        return $created['id'];
+        return $created->getId();
     }
 
     public function testCreateReport(): void

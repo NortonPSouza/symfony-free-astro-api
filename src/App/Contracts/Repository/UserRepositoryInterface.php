@@ -5,18 +5,16 @@ namespace App\App\Contracts\Repository;
 use App\Domain\Entity\User;
 use App\Domain\Exceptions\NotFoundException;
 use App\Domain\Exceptions\RepositoryException;
-use Doctrine\ORM\Exception\ORMException;
 
 interface UserRepositoryInterface
 {
 
     /**
      * @param User $user
-     * @return array|null
-     * @throws ORMException
+     * @return User
      * @throws RepositoryException
      */
-    public function create(User $user): ?array;
+    public function create(User $user): User;
 
     /**
      * @param string $id

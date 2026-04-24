@@ -7,9 +7,7 @@ use App\App\Contracts\Repository\ReportRepositoryInterface;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;
 use App\App\UseCase\Report\Create\Output\CreateReportOutput;
 use App\Domain\Builder\ReportBuilder;
-use App\Domain\Exceptions\EventException;
-use App\Domain\Exceptions\NotFoundException;
-use Doctrine\ORM\Exception\ORMException;
+use App\Domain\Exceptions\GenericException;
 
 readonly class CreateReportUseCase
 {
@@ -24,7 +22,7 @@ readonly class CreateReportUseCase
     public function execute(CreateReportInput $input): CreateReportOutput
     {
         try {
-            $report = (new ReportBuilder())
+            $report = new ReportBuilder()
                 ->withUserId($input->getUserId())
                 ->withMonth($input->getMonth())
                 ->withYear($input->getYear())
@@ -32,7 +30,7 @@ readonly class CreateReportUseCase
             $created = $this->reportRepository->create($report);
             $this->eventProcessReport->execute($created);
             return CreateReportOutput::success(['id' => $created->getProcessId()]);
-        } catch (ORMException|NotFoundException|EventException $exception) {
+        } catch (GenericException $exception) {
             return CreateReportOutput::failure($exception->getStatusCode(), $exception->getData());
         }
     }

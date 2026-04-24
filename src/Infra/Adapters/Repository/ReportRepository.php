@@ -34,9 +34,14 @@ readonly class ReportRepository implements ReportRepositoryInterface
                 ->setStatus($reportStatusMapper);
             $entityManager->persist($reportMapper);
             $entityManager->flush();
-            $report->setProcessId($reportMapper->getId())
-                ->setRequestedAt($reportMapper->getRequestedAt());
-            return $report;
+            return Report::fromPrimitives(
+                $report->getUserId(),
+                $reportMapper->getMonth(),
+                $reportMapper->getYear(),
+                $reportMapper->getStatus()->getId(),
+                $reportMapper->getId(),
+                $reportMapper->getRequestedAt()
+            );
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
@@ -61,7 +66,14 @@ readonly class ReportRepository implements ReportRepositoryInterface
             }
             $entityManager->persist($reportMapper);
             $entityManager->flush();
-            return $reportMapper->toDomain();
+            return Report::fromPrimitives(
+                $reportMapper->getUser()->getId(),
+                $reportMapper->getMonth(),
+                $reportMapper->getYear(),
+                $reportMapper->getStatus()->getId(),
+                $reportMapper->getId(),
+                $reportMapper->getRequestedAt()
+            );
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
@@ -78,6 +90,13 @@ readonly class ReportRepository implements ReportRepositoryInterface
         if (!$reportMapper) {
             throw new NotFoundException("Report not found");
         }
-        return $reportMapper->toDomain();
+        return Report::fromPrimitives(
+            $reportMapper->getUser()->getId(),
+            $reportMapper->getMonth(),
+            $reportMapper->getYear(),
+            $reportMapper->getStatus()->getId(),
+            $reportMapper->getId(),
+            $reportMapper->getRequestedAt()
+        );
     }
 }

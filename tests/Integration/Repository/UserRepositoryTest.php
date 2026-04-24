@@ -30,7 +30,7 @@ class UserRepositoryTest extends IntegrationTestCase
         return $this->zodiacRepository->getSignByBirth(new \DateTime('1990-05-15'));
     }
 
-    private function createUser(): array
+    private function createUser(): User
     {
         $zodiac = $this->getZodiac();
         $user = (new UserBuilder())
@@ -47,8 +47,8 @@ class UserRepositoryTest extends IntegrationTestCase
     public function testCreateAndFindUser(): void
     {
         $created = $this->createUser();
-        $this->assertArrayHasKey('id', $created);
-        $user = $this->userRepository->find($created['id']);
+        $this->assertNotNull($created->getId());
+        $user = $this->userRepository->find($created->getId());
         $this->assertEquals('John', $user->getName());
         $this->assertEquals('Doe', $user->getFamilyName());
         $this->assertEquals('john_test@example.com', $user->getEmail()->getValue());

@@ -3,21 +3,15 @@
 namespace App\Domain\Builder;
 
 use App\Domain\Entity\Report;
-use App\Domain\Types\ReportStatus;
 
 class ReportBuilder
 {
     private string $userId;
     private int $month;
     private int $year;
-    private int $status;
+    private int $status = 1;
     private ?string $processId = null;
     private ?\DateTime $requestedAt = null;
-
-    public function __construct()
-    {
-        $this->status = ReportStatus::PENDING->getStatus();
-    }
 
     public function withUserId(string $userId): self
     {
@@ -37,9 +31,21 @@ class ReportBuilder
         return $this;
     }
 
-    public function withStatus(ReportStatus $status): self
+    public function withStatus(int $status): self
     {
-        $this->status = $status->getStatus();
+        $this->status = $status;
+        return $this;
+    }
+
+    public function withProcessId(?string $processId): self
+    {
+        $this->processId = $processId;
+        return $this;
+    }
+
+    public function withRequestedAt(?\DateTime $requestedAt): self
+    {
+        $this->requestedAt = $requestedAt;
         return $this;
     }
 

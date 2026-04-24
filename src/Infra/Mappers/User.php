@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Infra\Mappers;
-use App\Domain\Entity\User as UserDomain;
-use App\Domain\ValueObjects\Email;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -32,7 +30,7 @@ class User
     #[ORM\Column(name: 'birth_time', type: 'time', nullable: true)]
     private ?\DateTime $birthTime;
 
-    #[ORM\ManyToOne(targetEntity: Zodiac::class)]
+    #[ORM\ManyToOne(targetEntity: Zodiac::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'zodiac_id', referencedColumnName: 'id', nullable: true)]
     private ?Zodiac $zodiac;
 
@@ -118,20 +116,4 @@ class User
         $this->zodiac = $zodiac;
         return $this;
     }
-
-    public function toDomain(): UserDomain
-    {
-        $zodiac = $this->getZodiac();
-        return new UserDomain(
-            $this->getId(),
-            $this->getName(),
-            $this->getFamilyName(),
-            Email::create($this->getEmail()),
-            null,
-            $this->getBirthDate(),
-            $this->getBirthTime(),
-            $zodiac ? \App\Domain\Entity\Zodiac::create($zodiac->getId(), $zodiac->getSign()) : null
-        );
-    }
-
 }

@@ -20,7 +20,7 @@ readonly class UserRepository implements UserRepositoryInterface
     ) {
     }
 
-    public function create(User $user): array
+    public function create(User $user): User
     {
         try {
             $entityManager = $this->connection->getEntityManager();
@@ -45,7 +45,16 @@ readonly class UserRepository implements UserRepositoryInterface
                 ->setUser($userMapper);
             $entityManager->persist($loginUserMapper);
             $entityManager->flush();
-            return ['id' => $userMapper->getId()];
+            return User::fromPrimitives(
+                $userMapper->getId(),
+                $userMapper->getName(),
+                $userMapper->getFamilyName(),
+                $userMapper->getEmail(),
+                $userMapper->getBirthDate(),
+                $userMapper->getBirthTime(),
+                $userMapper->getZodiac()?->getId(),
+                $userMapper->getZodiac()?->getSign()
+            );
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }
@@ -62,7 +71,16 @@ readonly class UserRepository implements UserRepositoryInterface
         if (!$userMapper) {
             throw new NotFoundException("User not Found");
         }
-        return $userMapper->toDomain();
+        return User::fromPrimitives(
+            $userMapper->getId(),
+            $userMapper->getName(),
+            $userMapper->getFamilyName(),
+            $userMapper->getEmail(),
+            $userMapper->getBirthDate(),
+            $userMapper->getBirthTime(),
+            $userMapper->getZodiac()?->getId(),
+            $userMapper->getZodiac()?->getSign()
+        );
     }
 
     public function findByEmail(string $email): User
@@ -82,7 +100,16 @@ readonly class UserRepository implements UserRepositoryInterface
         if (!$loginMapper) {
             throw new NotFoundException("Login not Found");
         }
-        $userDomain = $userMapper->toDomain();
+        $userDomain = User::fromPrimitives(
+            $userMapper->getId(),
+            $userMapper->getName(),
+            $userMapper->getFamilyName(),
+            $userMapper->getEmail(),
+            $userMapper->getBirthDate(),
+            $userMapper->getBirthTime(),
+            $userMapper->getZodiac()?->getId(),
+            $userMapper->getZodiac()?->getSign()
+        );
         $userDomain->setPassword(Password::fromHash($loginMapper->getPassword()));
         return $userDomain;
     }

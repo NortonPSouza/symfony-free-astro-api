@@ -53,10 +53,21 @@ class Report
         return $this->requestedAt;
     }
 
-    public function setRequestedAt(?\dateTime $requestedAt): Report
+    public function setRequestedAt(?\DateTime $requestedAt): Report
     {
         $this->requestedAt = $requestedAt;
         return $this;
     }
 
+    public static function fromPrimitives(
+        string $userId,
+        int $month,
+        int $year,
+        int $status,
+        ?string $processId = null,
+        ?\DateTime $requestedAt = null
+    ): Report
+    {
+        return new Report($userId, $month, $year, $status, $processId, $requestedAt);
+    }
 }

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Infra\Mappers;
-use App\Domain\Entity\Report as ReportDomain;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -30,7 +29,7 @@ class Report
     #[ORM\Column(name: 'completed_at', type: 'date', nullable: true)]
     private ?\DateTime $completedAt;
 
-    #[ORM\ManyToOne(targetEntity: ReportStatus::class)]
+    #[ORM\ManyToOne(targetEntity: ReportStatus::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'status', referencedColumnName: 'id', nullable: false)]
     private ReportStatus $status;
 
@@ -115,17 +114,5 @@ class Report
     {
         $this->status = $status;
         return $this;
-    }
-
-    public function toDomain(): ReportDomain
-    {
-        return new ReportDomain(
-            $this->getUser()->getId(),
-            $this->getMonth(),
-            $this->getYear(),
-            $this->getStatus()->getId(),
-            $this->getId(),
-            $this->getRequestedAt(),
-        );
     }
 }

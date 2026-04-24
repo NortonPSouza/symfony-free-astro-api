@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Infra\Mappers;
-use App\Domain\Entity\Login as LoginDomain;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -52,14 +51,5 @@ class Login
     {
         $this->password = $password;
         return $this;
-    }
-
-    public function toDomain(): LoginDomain
-    {
-        return new LoginDomain(
-            $this->getId(),
-            $this->getEmail(),
-            $this->getPassword()
-        );
     }
 }

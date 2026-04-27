@@ -3,6 +3,7 @@
 namespace App\Infra\Ports\Command;
 
 use App\Infra\Adapters\Database\ConnectionDoctrine;
+use App\Infra\Mappers\PermissionType;
 use App\Infra\Mappers\ReportStatus;
 use App\Infra\Mappers\Zodiac;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -41,6 +42,13 @@ class SeedCommand extends Command
         } else {
             $this->seedReportStatus($entityManager);
             $output->writeln('<info>Report statuses seeded.</info>');
+        }
+
+        if ($this->hasData($entityManager, PermissionType::class)) {
+            $output->writeln('<comment>Permission type data already seeded, skipping.</comment>');
+        } else {
+            $this->seedPermissionType($entityManager);
+            $output->writeln('<info>Permission types seeded.</info>');
         }
 
         $output->writeln('<info>Seed completed.</info>');
@@ -99,6 +107,20 @@ class SeedCommand extends Command
             $status = new ReportStatus();
             $status->setId($id)->setDescription($description);
             $entityManager->persist($status);
+        }
+        $entityManager->flush();
+    }
+
+    private function seedPermissionType($entityManager): void
+    {
+        $permissions = [
+            [1, 'PUBLISH_HOROSCOPE'],
+            [2, 'COMMON_USER'],
+        ];
+        foreach ($permissions as [$id, $description]) {
+            $permission = new PermissionType();
+            $permission->setId($id)->setDescription($description);
+            $entityManager->persist($permission);
         }
         $entityManager->flush();
     }

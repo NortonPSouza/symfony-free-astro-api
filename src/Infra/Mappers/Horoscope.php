@@ -16,15 +16,26 @@ class Horoscope
     #[ORM\Column(name: 'start_date', type: 'date', nullable: false)]
     private \DateTime $startDate;
 
+    #[ORM\Column(name: 'end_date', type: 'date', nullable: false)]
+    private \DateTime $endDate;
+
     #[ORM\Column(name: 'message', type: 'string', length: 255, nullable: false)]
     private string $message;
 
     #[ORM\Column(name: 'luck_number', type: 'integer', nullable: false)]
     private int $luckNumber;
 
+    #[ORM\Column(name: 'published', type: 'boolean', options: ['default' => false])]
+    private bool $published;
+
     #[ORM\ManyToOne(targetEntity: Zodiac::class)]
     #[ORM\JoinColumn(name: 'zodiac_id', referencedColumnName: 'id', nullable: false)]
     private Zodiac $zodiac;
+
+    public function __construct()
+    {
+        $this->setPublished(false);
+    }
 
     public function getId(): string
     {
@@ -45,6 +56,17 @@ class Horoscope
     public function setStartDate(\DateTime $startDate): Horoscope
     {
         $this->startDate = $startDate;
+        return $this;
+    }
+
+    public function getEndDate(): \DateTime
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(\DateTime $endDate): Horoscope
+    {
+        $this->endDate = $endDate;
         return $this;
     }
 
@@ -70,6 +92,17 @@ class Horoscope
         return $this;
     }
 
+    public function isPublished(): bool
+    {
+        return $this->published;
+    }
+
+    public function setPublished(bool $published): Horoscope
+    {
+        $this->published = $published;
+        return $this;
+    }
+
     public function getZodiac(): Zodiac
     {
         return $this->zodiac;
@@ -80,5 +113,4 @@ class Horoscope
         $this->zodiac = $zodiac;
         return $this;
     }
-
 }

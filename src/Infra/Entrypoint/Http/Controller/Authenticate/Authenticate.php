@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Http\Controller\Authenticate;
+namespace App\Infra\Entrypoint\Http\Controller\Authenticate;
 
 use App\App\UseCase\Authenticate\AuthenticateUseCase;
 use App\App\UseCase\Authenticate\Input\AuthenticateInput;

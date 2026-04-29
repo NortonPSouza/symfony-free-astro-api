@@ -12,7 +12,7 @@ class Zodiac
     {
     }
 
-    static function create(string $id, string $sign): Zodiac
+    public static function fromPrimitives(string $id, string $sign): Zodiac
     {
         return new Zodiac($id, $sign);
     }

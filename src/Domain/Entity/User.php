@@ -92,7 +92,7 @@ class User implements ArraySerializationInterface
     ): User
     {
         $zodiac = $zodiacId && $zodiacSign
-            ? Zodiac::create($zodiacId, $zodiacSign)
+            ? Zodiac::fromPrimitives($zodiacId, $zodiacSign)
             : null;
         return new User($id, $name, $familyName, Email::create($email), $password, $birthDate, $birthTime, $zodiac);
     }

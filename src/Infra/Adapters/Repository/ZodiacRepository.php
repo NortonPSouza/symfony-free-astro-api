@@ -42,7 +42,7 @@ readonly class ZodiacRepository implements ZodiacRepositoryInterface
                 ->setParameter('monthDay', $monthDay)
                 ->getQuery()
                 ->getSingleResult();
-            return ZodiacDomain::create($zodiac->getId(), $zodiac->getSign());
+            return ZodiacDomain::fromPrimitives($zodiac->getId(), $zodiac->getSign());
         } catch (\Exception $exception) {
             throw new RepositoryException($exception->getMessage());
         }

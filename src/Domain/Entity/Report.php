@@ -3,16 +3,16 @@
 namespace App\Domain\Entity;
 
 
-class Report
+readonly class Report
 {
 
     public function __construct(
-        private readonly string $userId,
-        private readonly int $month,
-        private readonly int $year,
-        private readonly int $status,
-        private readonly ?string $processId,
-        private readonly ?\DateTime $requestedAt
+        private string $userId,
+        private int $month,
+        private int $year,
+        private int $status,
+        private ?string $processId,
+        private ?\DateTime $requestedAt
     )
     {
     }

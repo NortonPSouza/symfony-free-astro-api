@@ -43,7 +43,7 @@ class CreateUserUseCaseTest extends TestCase
             'birth_date' => '1990-05-15',
         ]);
 
-        $zodiac = Zodiac::create('uuid-zodiac', 'Taurus');
+        $zodiac = Zodiac::fromPrimitives('uuid-zodiac', 'Taurus');
 
         $this->zodiacRepository
             ->expects($this->once())
@@ -82,7 +82,7 @@ class CreateUserUseCaseTest extends TestCase
             'birth_date' => '1990-05-15',
         ]);
 
-        $zodiac = Zodiac::create('uuid-zodiac', 'Taurus');
+        $zodiac = Zodiac::fromPrimitives('uuid-zodiac', 'Taurus');
 
         $this->zodiacRepository
             ->expects($this->once())

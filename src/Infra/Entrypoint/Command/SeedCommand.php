@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Command;
+namespace App\Infra\Entrypoint\Command;
 
 use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Mappers\PermissionType;

@@ -10,16 +10,27 @@ A tabela `horoscope` já existe no schema mas não possui endpoints nem lógica.
 
 ## O que faz
 
-Um admin cria/atualiza horóscopos semanais para cada signo. Usuários consultam o horóscopo do seu signo para a semana atual.
+Um admin (com permissão `PUBLISH_HOROSCOPE`) cria/publica horóscopos semanais para cada signo. Usuários consultam o horóscopo do seu signo para a semana atual.
+
+---
+
+## Permissões
+
+Controlado pela tabela `user_permission` + `permission_type`:
+
+| ID | Permissão | Descrição |
+|----|-----------|-----------|
+| 1  | PUBLISH_HOROSCOPE | Pode criar e publicar horóscopos |
+| 2  | COMMON_USER | Usuário padrão (consulta apenas) |
 
 ---
 
 ## Por que exercita cada conceito
 
 ### Transações
-- Publicar horóscopos da semana insere/atualiza 12 registros (um por signo) atomicamente
+- Criar horóscopos da semana insere 12 registros (um por signo) atomicamente
 - Se o de Libra falhar, nenhum pode ser salvo
-- Tabela `horoscope_period` controla status (DRAFT → PUBLISHED), exigindo transação entre duas tabelas
+- Campo `published` controla visibilidade (false → true), exigindo transação atômica nos 12 registros
 
 ### Deadlocks
 - Dois admins tentam publicar horóscopos da mesma semana simultaneamente
@@ -27,124 +38,108 @@ Um admin cria/atualiza horóscopos semanais para cada signo. Usuários consultam
 - Praticar `SELECT ... FOR UPDATE`, locks explícitos, detecção e retry
 
 ### Joins Avançados
-- Horóscopo da semana atual do usuário → `user JOIN zodiac JOIN horoscope_entry JOIN horoscope_period` com filtro por range de datas
-- Histórico de horóscopos de um usuário → join com subquery para pegar o mais recente por período
+- Horóscopo da semana atual do usuário → `user JOIN zodiac JOIN horoscope` com filtro por range de datas
+- Histórico de horóscopos de um usuário → join com filtro por meses
 - Signos sem horóscopo publicado → `LEFT JOIN` com `WHERE IS NULL`
-- Ranking de números da sorte por signo no mês → `GROUP BY` com `HAVING` e window functions
+- Ranking de números da sorte por signo no mês → `GROUP BY` com window functions
 
 ---
 
 ## Estrutura de Tabelas
 
 ```sql
--- Já existe
-horoscope (id, start_date, message, luck_number, zodiac_id)
+-- Já existe (com campos adicionados: end_date, published)
+horoscope (id, start_date, end_date, message, luck_number, published, zodiac_id)
 
--- Novas
-CREATE TABLE horoscope_period (
-    id BINARY(16) PRIMARY KEY,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    status TINYINT NOT NULL DEFAULT 1,  -- 1=DRAFT, 2=PUBLISHED
-    published_at DATETIME NULL,
-    created_by BINARY(16) NOT NULL,     -- user_id do admin
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_period_dates (start_date, end_date),
-    FOREIGN KEY (created_by) REFERENCES user(id)
-);
-
-CREATE TABLE horoscope_entry (
-    id BINARY(16) PRIMARY KEY,
-    period_id BINARY(16) NOT NULL,
-    zodiac_id BINARY(16) NOT NULL,
-    message TEXT NOT NULL,
-    luck_number INT NOT NULL,
-    compatibility_sign_id BINARY(16) NULL,
-    UNIQUE KEY uk_entry_period_zodiac (period_id, zodiac_id),
-    FOREIGN KEY (period_id) REFERENCES horoscope_period(id),
-    FOREIGN KEY (zodiac_id) REFERENCES zodiac(id),
-    FOREIGN KEY (compatibility_sign_id) REFERENCES zodiac(id)
-);
+-- Permissões (já criadas)
+permission_type (id, description)
+user_permission (id, user_id, permission_type_id)
 ```
+
+Sem tabelas novas para horóscopo. Um "período" é representado pelo par `start_date` + `end_date` nos registros da `horoscope`.
 
 ---
 
 ## Endpoints
 
-| Method | Route                                | Auth | Descrição                                      |
-|--------|--------------------------------------|------|-------------------------------------------------|
-| POST   | `/api/v1/horoscope/period`           | ✓    | Cria período com 12 entries (transação)         |
-| PUT    | `/api/v1/horoscope/period/{id}/publish` | ✓ | Publica atomicamente (lock + transação)         |
-| GET    | `/api/v1/horoscope/me`               | ✓    | Horóscopo do usuário logado (joins)             |
-| GET    | `/api/v1/horoscope/history?months=3` | ✓    | Histórico com paginação (joins + subqueries)    |
+| Method | Route                                      | Auth | Permissão          | Descrição                                    |
+|--------|--------------------------------------------|------|---------------------|----------------------------------------------|
+| POST   | `/api/v1/horoscope/week`                   | ✓    | PUBLISH_HOROSCOPE   | Cria 12 entries da semana (transação)        |
+| PUT    | `/api/v1/horoscope/week/{start_date}/publish` | ✓ | PUBLISH_HOROSCOPE   | Publica os 12 atomicamente (lock + transação)|
+| GET    | `/api/v1/horoscope/me`                     | ✓    | COMMON_USER         | Horóscopo do usuário logado (joins)          |
+| GET    | `/api/v1/horoscope/history?months=3`       | ✓    | COMMON_USER         | Histórico com paginação (joins)              |
 
 ---
 
 ## Cenários de Prática
 
-### 1. Transação — Criar período
+### 1. Transação — Criar semana
+
 ```
 BEGIN TRANSACTION
-  INSERT horoscope_period (status=DRAFT)
-  INSERT horoscope_entry x12 (um por signo)
+  INSERT horoscope (zodiac=Aries, start_date, end_date, published=false, ...)
+  INSERT horoscope (zodiac=Taurus, ...)
+  ... x12 (um por signo)
   Se qualquer entry falhar → ROLLBACK
 COMMIT
 ```
 
 ### 2. Deadlock — Publish concorrente
+
 ```
--- Admin A                          -- Admin B
-BEGIN                               BEGIN
-SELECT ... FOR UPDATE               SELECT ... FOR UPDATE  ← WAIT/DEADLOCK
-  WHERE period_id = X                 WHERE period_id = X
-UPDATE status = PUBLISHED           UPDATE status = PUBLISHED
-COMMIT                              COMMIT (ou retry após deadlock)
+-- Admin A                                    -- Admin B
+BEGIN                                         BEGIN
+SELECT ... FOR UPDATE                         SELECT ... FOR UPDATE  ← WAIT/DEADLOCK
+  WHERE start_date = X AND end_date = Y        WHERE start_date = X AND end_date = Y
+UPDATE published = true                       UPDATE published = true
+COMMIT                                        COMMIT (ou retry após deadlock)
 ```
 
 ### 3. Joins — Horóscopo do usuário
+
 ```sql
-SELECT he.message, he.luck_number, z2.sign AS compatibility
+SELECT h.message, h.luck_number, z.sign
 FROM user u
 JOIN zodiac z ON u.zodiac_id = z.id
-JOIN horoscope_entry he ON he.zodiac_id = z.id
-JOIN horoscope_period hp ON he.period_id = hp.id
-LEFT JOIN zodiac z2 ON he.compatibility_sign_id = z2.id
+JOIN horoscope h ON h.zodiac_id = z.id
 WHERE u.id = :userId
-  AND hp.status = 2
-  AND hp.start_date <= CURDATE()
-  AND hp.end_date >= CURDATE();
+  AND h.published = true
+  AND h.start_date <= CURDATE()
+  AND h.end_date >= CURDATE();
 ```
 
-### 4. Joins — Histórico com subquery
+### 4. Joins — Histórico
+
 ```sql
-SELECT hp.start_date, hp.end_date, he.message, he.luck_number
-FROM horoscope_entry he
-JOIN horoscope_period hp ON he.period_id = hp.id
-JOIN zodiac z ON he.zodiac_id = z.id
+SELECT h.start_date, h.end_date, h.message, h.luck_number
+FROM horoscope h
+JOIN zodiac z ON h.zodiac_id = z.id
 JOIN user u ON u.zodiac_id = z.id
 WHERE u.id = :userId
-  AND hp.status = 2
-  AND hp.start_date >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
-ORDER BY hp.start_date DESC;
+  AND h.published = true
+  AND h.start_date >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
+ORDER BY h.start_date DESC;
 ```
 
-### 5. LEFT JOIN — Signos sem horóscopo
+### 5. LEFT JOIN — Signos sem horóscopo na semana
+
 ```sql
 SELECT z.sign
 FROM zodiac z
-LEFT JOIN horoscope_entry he ON he.zodiac_id = z.id
-  AND he.period_id = :periodId
-WHERE he.id IS NULL;
+LEFT JOIN horoscope h ON h.zodiac_id = z.id
+  AND h.start_date = :startDate
+  AND h.end_date = :endDate
+WHERE h.id IS NULL;
 ```
 
 ### 6. Window Functions — Ranking luck_number
+
 ```sql
-SELECT z.sign, he.luck_number,
-       RANK() OVER (ORDER BY he.luck_number DESC) AS ranking
-FROM horoscope_entry he
-JOIN horoscope_period hp ON he.period_id = hp.id
-JOIN zodiac z ON he.zodiac_id = z.id
-WHERE hp.status = 2
-  AND MONTH(hp.start_date) = :month
-  AND YEAR(hp.start_date) = :year;
+SELECT z.sign, h.luck_number,
+       RANK() OVER (ORDER BY h.luck_number DESC) AS ranking
+FROM horoscope h
+JOIN zodiac z ON h.zodiac_id = z.id
+WHERE h.published = true
+  AND MONTH(h.start_date) = :month
+  AND YEAR(h.start_date) = :year;
 ```

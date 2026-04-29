@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Http\Controller\User;
+namespace App\Infra\Entrypoint\Http\Controller\User;
 
 use App\App\UseCase\User\Create\CreateUserUseCase;
 use App\App\UseCase\User\Create\Input\CreateUserInput;

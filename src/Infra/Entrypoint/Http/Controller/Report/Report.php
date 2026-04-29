@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Http\Controller\Report;
+namespace App\Infra\Entrypoint\Http\Controller\Report;
 
 use App\App\UseCase\Report\Create\CreateReportUseCase;
 use App\App\UseCase\Report\Create\Input\CreateReportInput;

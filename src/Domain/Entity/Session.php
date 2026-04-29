@@ -40,5 +40,12 @@ readonly class Session
         return $this->tokenType;
     }
 
-
+    public static function fromPrimitives(
+        string $accessToken,
+        string $refreshToken,
+        string $tokenType = 'Bearer'
+    ): Session
+    {
+        return new Session($accessToken, $refreshToken, $tokenType);
+    }
 }

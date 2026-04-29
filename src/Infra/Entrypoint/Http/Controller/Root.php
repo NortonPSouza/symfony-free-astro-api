@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Http\Controller;
+namespace App\Infra\Entrypoint\Http\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

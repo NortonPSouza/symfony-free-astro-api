@@ -24,7 +24,7 @@ readonly class TokenRedis implements TokenMemoryInterface
     public function getSession(string $key): Session
     {
        $tokenMemory = json_decode($this->memory->get($key), true);
-       return new Session(
+       return Session::fromPrimitives(
            $tokenMemory['access_token'],
            $tokenMemory['refresh_token']
        );

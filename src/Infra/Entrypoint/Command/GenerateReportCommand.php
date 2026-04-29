@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infra\Ports\Command;
+namespace App\Infra\Entrypoint\Command;
 
 use App\App\Contracts\Database\ConnectionInterface;
 use App\App\UseCase\Report\Generate\GenerateReportUseCase;

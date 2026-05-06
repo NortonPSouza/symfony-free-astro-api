@@ -11,6 +11,9 @@ use App\Infra\Adapters\Database\ConnectionDoctrine;
 use App\Infra\Mappers\Report as ReportMapper;
 use App\Infra\Mappers\ReportStatus;
 use App\Infra\Mappers\User;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\Exception\ORMException;
 
 readonly class ReportRepository implements ReportRepositoryInterface
 {
@@ -47,25 +50,42 @@ readonly class ReportRepository implements ReportRepositoryInterface
         }
     }
 
+    /**
+     * @throws RepositoryException
+     * @throws NotFoundException
+     * @throws Exception|ORMException
+     */
     public function updateStatus(string $reportId, ReportStatusType $status): Report
     {
         try {
             $entityManager = $this->connection->getEntityManager();
+            $this->connection->begin();
             $reportStatusMapper = $entityManager->getReference(ReportStatus::class, $status->getStatus());
-            $reportMapper = $entityManager->getRepository(ReportMapper::class)->find($reportId);
-        } catch (\Exception $exception) {
+            $reportMapper = $entityManager->find(
+                ReportMapper::class,
+                $reportId,
+                LockMode::PESSIMISTIC_WRITE
+            );
+        } catch (\Exception|Exception|ORMException $exception) {
+            $this->connection->rollBack();
             throw new RepositoryException($exception->getMessage());
         }
         if (!$reportMapper) {
+            $this->connection->rollBack();
             throw new NotFoundException("Report not found");
+        }
+        if ($status === ReportStatusType::PROCESSING
+            && $reportMapper->getStatus()->getId() !== ReportStatusType::PENDING->value
+        ) {
+            $this->connection->rollback();
+            throw new RepositoryException("Invalid state transition");
         }
         try {
             $reportMapper->setStatus($reportStatusMapper);
             if ($status === ReportStatusType::COMPLETED) {
                 $reportMapper->setCompletedAt(new \DateTime());
             }
-            $entityManager->persist($reportMapper);
-            $entityManager->flush();
+            $this->connection->commit();
             return Report::fromPrimitives(
                 $reportMapper->getUser()->getId(),
                 $reportMapper->getMonth(),
@@ -74,7 +94,8 @@ readonly class ReportRepository implements ReportRepositoryInterface
                 $reportMapper->getId(),
                 $reportMapper->getRequestedAt()
             );
-        } catch (\Exception $exception) {
+        } catch (\Exception|Exception $exception) {
+            $this->connection->rollBack();
             throw new RepositoryException($exception->getMessage());
         }
     }

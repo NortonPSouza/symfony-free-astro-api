@@ -25,9 +25,16 @@ readonly class CreateHoroscopeInput implements ArraySerializationInterface
         }
     }
 
-    static function fromArray(array $messages, \DateTime $starDate, \DateTime $endDate): CreateHoroscopeInput
+    /**
+     * @throws \DateMalformedStringException|InvalidParamsException
+     */
+    static function fromArray(array $inputRequest): CreateHoroscopeInput
     {
-        return new CreateHoroscopeInput($messages, $starDate, $endDate);
+        return new CreateHoroscopeInput(
+            $inputRequest['messages'] ?? [],
+            !empty($inputRequest['start_date']) ? new \DateTime($inputRequest['start_date']) : null,
+            !empty($inputRequest['end_date']) ? new \DateTime($inputRequest['end_date']) : null
+        );
     }
 
     public function getMessages(): array

@@ -4,24 +4,28 @@ namespace App\App\UseCase\Horoscope\Create;
 
 use App\App\Contracts\Database\ConnectionInterface;
 use App\App\Contracts\Repository\HoroscopeRepositoryInterface;
+use App\App\Contracts\Validation\ValidationUserPermissionInterface;
 use App\App\UseCase\Horoscope\Create\Input\CreateHoroscopeInput;
 use App\App\UseCase\Horoscope\Create\Output\CreateHoroscopeOutput;
 use App\Domain\Builder\HoroscopeBuilder;
 use App\Domain\Entity\Zodiac;
 use App\Domain\Exceptions\GenericException;
+use App\Domain\Types\PermissionType;
 
-readonly class CreateUseCase
+readonly class CreateHoroscopeUseCase
 {
     public function __construct(
         private HoroscopeRepositoryInterface $horoscopeRepository,
+        private ValidationUserPermissionInterface $validationUserPermission,
         private ConnectionInterface $connection
     )
     {
     }
 
-    public function execute(CreateHoroscopeInput $input): CreateHoroscopeOutput
+    public function execute(CreateHoroscopeInput $input, string $userId): CreateHoroscopeOutput
     {
         try {
+            $this->validationUserPermission->validate($userId, PermissionType::PUBLISH_HOROSCOPE);
             $builder = new HoroscopeBuilder()
                 ->withStartDate($input->getStarDate())
                 ->withEndDate($input->getEndDate());

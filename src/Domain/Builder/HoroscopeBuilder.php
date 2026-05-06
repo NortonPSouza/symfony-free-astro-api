@@ -8,11 +8,11 @@ use App\Domain\Entity\Zodiac;
 class HoroscopeBuilder
 {
     private ?string $id = null;
-    private \DateTime $startDate;
-    private \DateTime $endDate;
-    private string $message;
-    private int $luckNumber;
-    private Zodiac $zodiac;
+    private ?\DateTime $startDate = null;
+    private ?\DateTime $endDate = null;
+    private ?string $message = null;
+    private ?int $luckNumber = null;
+    private ?Zodiac $zodiac = null;
 
     public function withId(string $id): HoroscopeBuilder
     {

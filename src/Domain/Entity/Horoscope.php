@@ -7,11 +7,11 @@ readonly class Horoscope
 
     public function __construct(
         private ?string $id,
-        private \DateTime $startDate,
-        private \DateTime $endDate,
-        private string $message,
-        private int $luckNumber,
-        private Zodiac $zodiac
+        private ?\DateTime $startDate,
+        private ?\DateTime $endDate,
+        private ?string $message,
+        private ?int $luckNumber,
+        private ?Zodiac $zodiac
     )
     {
     }
@@ -21,7 +21,7 @@ readonly class Horoscope
         return $this->id;
     }
 
-    public function getStartDate(): \DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }
@@ -31,17 +31,17 @@ readonly class Horoscope
         return $this->endDate;
     }
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
-    public function getLuckNumber(): int
+    public function getLuckNumber(): ?int
     {
         return $this->luckNumber;
     }
 
-    public function getZodiac(): Zodiac
+    public function getZodiac(): ?Zodiac
     {
         return $this->zodiac;
     }

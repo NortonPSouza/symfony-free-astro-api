@@ -12,6 +12,7 @@ tags:
   - name: Health
   - name: Auth
   - name: User
+  - name: Horoscope
   - name: Report
 
 paths:
@@ -155,6 +156,91 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/horoscope:
+    post:
+      tags: [Horoscope]
+      summary: Create horoscope messages (batch for all 12 signs)
+      description: Requires PUBLISH_HOROSCOPE permission. Creates horoscope entries for all 12 zodiac signs within a date range.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [messages, start_date, end_date]
+              properties:
+                start_date:
+                  type: string
+                  format: date
+                  example: "2025-06-01"
+                end_date:
+                  type: string
+                  format: date
+                  example: "2025-06-07"
+                messages:
+                  type: array
+                  minItems: 12
+                  maxItems: 12
+                  items:
+                    type: object
+                    required: [zodiac_id, message, luck_number]
+                    properties:
+                      zodiac_id:
+                        type: string
+                        format: uuid
+                        example: 019d457a-a891-7ac3-8796-40ea3a3b5f23
+                      message:
+                        type: string
+                        example: "Today the stars align in your favor."
+                      luck_number:
+                        type: integer
+                        example: 7
+      responses:
+        '201':
+          description: Horoscope created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOutput'
+        '400':
+          $ref: '#/components/responses/InvalidParams'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/horoscope/{zodiacId}:
+    get:
+      tags: [Horoscope]
+      summary: Find current horoscope by zodiac sign
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: zodiacId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 019d457a-a891-7ac3-8796-40ea3a3b5f23
+      responses:
+        '200':
+          description: Horoscope found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GenericOutput'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HoroscopeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /api/v1/report:
     post:
       tags: [Report]
@@ -238,6 +324,30 @@ components:
           type: string
           example: Bearer
 
+    HoroscopeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sign:
+          type: string
+          example: Aries
+        message:
+          type: string
+          example: "Today the stars align in your favor."
+        luck_number:
+          type: integer
+          example: 7
+        start_date:
+          type: string
+          format: date
+          example: "2025-06-01"
+        end_date:
+          type: string
+          format: date
+          example: "2025-06-07"
+
   responses:
     InvalidParams:
       description: Invalid parameters
@@ -259,6 +369,17 @@ components:
               exception:
                 type: string
                 example: Invalid or expired token
+
+    Forbidden:
+      description: Forbidden — insufficient permissions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              exception:
+                type: string
+                example: User not have access this resource
 
     NotFound:
       description: Resource not found

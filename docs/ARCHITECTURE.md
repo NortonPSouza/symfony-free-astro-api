@@ -13,9 +13,10 @@ The architecture follows the **Hexagonal (Ports & Adapters)** pattern with clear
 ```
 src/
 ├── Domain/          ← Business core (zero external dependencies)
-│   ├── Entity/      ← Entities: User, Report, Zodiac, Session
-│   ├── ValueObjects/← Token (immutable)
-│   ├── Types/       ← Enums: ReportStatus, GrantTypeLogin, LifeTimeToken
+│   ├── Builder/     ← Builders: HoroscopeBuilder, ReportBuilder, UserBuilder
+│   ├── Entity/      ← Entities: User, Report, Zodiac, Session, Horoscope, UserPermission
+│   ├── ValueObjects/← Token, Email, Password (immutable, self-validating)
+│   ├── Types/       ← Enums: ReportStatus, GrantTypeLogin, LifeTimeToken, PermissionType
 │   └── Exceptions/  ← Typed domain exceptions
 │
 ├── App/             ← Application layer (orchestrates the domain)
@@ -23,10 +24,10 @@ src/
 │   └── Contracts/   ← Interfaces (ports) for repositories, gateways, etc.
 │
 ├── Infra/           ← Concrete implementations (adapters)
-│   ├── Adapters/    ← Database, Queue, Gateway, Encoder, Memory, Repository
-│   ├── Ports/       ← Entry points: HTTP Controllers + CLI Commands
-│   ├── Mappers/     ← Entity-to-database mapping
-│   └── Security/    ← JWT authentication listener
+│   ├── Adapters/    ← Database, Queue, Gateway, Encoder, Memory, Repository, Validation
+│   ├── Entrypoint/  ← Entry points: HTTP Controllers + CLI Commands
+│   ├── Mappers/     ← Entity-to-database mapping (Doctrine)
+│   └── Security/    ← AuthenticateTokenListener, ExceptionListener
 │
 └── Kernel.php
 ```
@@ -62,12 +63,23 @@ User CRUD with automatic zodiac sign association.
 
 | Item | Detail |
 |---|---|
-| Entity | User |
-| Use Cases | CreateUser, FindUser, DeleteUser |
+| Entity | User, UserPermission |
+| Value Objects | Email, Password |
+| Use Cases | CreateUserUseCase, FindUserUseCase, DeleteUserUseCase |
 | Endpoints | `POST /api/v1/user`, `GET /api/v1/user/{id}`, `DELETE /api/v1/user/{id}` |
-| Rules | Encrypted password (bcrypt), sign calculated from birth date |
+| Rules | Email validated via VO, password min 6 chars, bcrypt hash, sign calculated from birth date, permission assigned on creation |
 
-### 3. Report (Astrological Report)
+### 3. Horoscope
+Manages daily/weekly horoscope messages per zodiac sign. Requires `PUBLISH_HOROSCOPE` permission to create.
+
+| Item | Detail |
+|---|---|
+| Entity | Horoscope |
+| Use Cases | CreateHoroscopeUseCase, FindHoroscopeUseCase |
+| Endpoints | `POST /api/v1/horoscope` (auth + permission), `GET /api/v1/horoscope/{zodiacId}` (auth) |
+| Rules | Batch creation per zodiac, permission-gated via ValidateUserPermission |
+
+### 4. Report (Astrological Report)
 Most complex context — involves asynchronous processing with a state machine.
 
 | Item | Detail |
@@ -100,7 +112,7 @@ HTTP Request ──▶ CreateReportUseCase ──▶ MySQL (status: PENDING)
                         └──▶ MongoDB (processing log)
 ```
 
-### 4. Zodiac (Support)
+### 5. Zodiac (Support)
 Support context — provides data for the 12 zodiac signs.
 
 | Item | Detail |
@@ -109,7 +121,7 @@ Support context — provides data for the 12 zodiac signs.
 | Repository | ZodiacRepository |
 | Usage | Associated with User on creation (finds sign by birth date) |
 
-### 5. Fortune (Support)
+### 6. Fortune (Support)
 Provides random mystical messages for reports.
 
 | Item | Detail |
@@ -125,6 +137,8 @@ Provides random mystical messages for reports.
 ```
 Authentication ──uses──▶ User (lookup by email/id)
 User ──────────uses──▶ Zodiac (associates sign on creation)
+Horoscope ─────uses──▶ Zodiac (message per sign)
+Horoscope ─────uses──▶ UserPermission (permission gate)
 Report ────────uses──▶ User (data for PDF generation)
 Report ────────uses──▶ Fortune (report content)
 ```
@@ -151,7 +165,7 @@ Report ────────uses──▶ Fortune (report content)
 |---|---|---|
 | Web Server | FrankenPHP (Caddy) | Serves the API with PHP worker mode (4 workers) |
 | Framework | Symfony | Routing, DI, Console, Events |
-| Relational DB | MySQL 8.0 | Users, Reports, Zodiac, Login, Horoscope |
+| Relational DB | MySQL 8.0 | Users, Reports, Zodiac, Login, Horoscope, Permissions |
 | Document DB | MongoDB 8.0 | Processed report logs |
 | Cache / Session | Redis 8.6 | JWT sessions (access + refresh token) |
 | Queue | RabbitMQ 4.2 | Async report processing |
@@ -190,38 +204,7 @@ The project uses the `dunglas/frankenphp:1-php8.4` image with Caddy configured i
 ---
 
 ## Data Model (MySQL)
-
-```
-┌──────────┐     ┌────────────┐     ┌─────────┐
-│  zodiac  │◄────│    user    │◄────│  report  │
-│──────────│     │────────────│     │─────────│
-│ id (UUID)│     │ id (UUID)  │     │ id (UUID)│
-│ sign     │     │ name       │     │ month    │
-│ start_date│    │ family_name│     │ year     │
-│ end_date │     │ email (UQ) │     │ status ──┼──▶ report_status
-└──────────┘     │ birth_date │     │ user_id  │
-                 │ birth_time │     │ requested│
-                 │ zodiac_id  │     │ completed│
-                 └─────┬──────┘     └──────────┘
-                       │
-                 ┌─────┴──────┐     ┌──────────┐
-                 │ login_user │────▶│  login   │
-                 │────────────│     │──────────│
-                 │ login_id   │     │ id (UUID)│
-                 │ user_id    │     │ email(UQ)│
-                 └────────────┘     │ password │
-                                    └──────────┘
-
-┌──────────────┐
-│  horoscope   │
-│──────────────│
-│ id (UUID)    │
-│ start_date   │
-│ message      │
-│ luck_number  │
-│ zodiac_id ───┼──▶ zodiac
-└──────────────┘
-```
+![Banco de Dados](./docs/images/free_astro_database_diagram.png)
 
 **MongoDB** — collection `report_logs`:
 ```json
@@ -241,23 +224,38 @@ The project uses the `dunglas/frankenphp:1-php8.4` image with Caddy configured i
 
 - **JWT (HS256)** — access token (15 min) + refresh token (7 days)
 - **Redis sessions** — refresh token validated against stored session
-- **Authentication listener** — routes with `_authenticated: true` are protected via AuthenticateTokenListener (Symfony Kernel Event)
+- **AuthenticateTokenListener** — routes with `_authenticated: true` are protected (Symfony KernelEvents::REQUEST)
+- **ExceptionListener** — global exception handler converts domain exceptions to JSON responses
 - **Bcrypt** — passwords encrypted with BcryptPasswordEncoder
+- **Permission system** — PermissionType enum (PUBLISH_HOROSCOPE, COMMON_USER) validated via ValidateUserPermission adapter
 
 ---
 
 ## API Endpoints
 
-| Method | Route | Auth | Description |
-|---|---|---|---|
-| GET | `/health` | ✗ | Health check |
-| POST | `/api/v1/token` | ✗ | Login / refresh token |
-| POST | `/api/v1/user` | ✓ | Create user |
-| GET | `/api/v1/user/{id}` | ✓ | Find user |
-| DELETE | `/api/v1/user/{id}` | ✓ | Delete user |
-| POST | `/api/v1/report` | ✓ | Request monthly report |
+| Method | Route | Auth | Permission | Description |
+|---|---|---|---|---|
+| GET | `/` | ✗ | — | Root |
+| GET | `/health` | ✗ | — | Health check |
+| POST | `/api/v1/token` | ✗ | — | Login / refresh token |
+| POST | `/api/v1/user` | ✓ | — | Create user |
+| GET | `/api/v1/user/{id}` | ✓ | — | Find user |
+| DELETE | `/api/v1/user/{id}` | ✓ | — | Delete user |
+| POST | `/api/v1/horoscope` | ✓ | PUBLISH_HOROSCOPE | Create horoscope (batch) |
+| GET | `/api/v1/horoscope/{zodiacId}` | ✓ | — | Find horoscope by zodiac |
+| POST | `/api/v1/report` | ✓ | — | Request monthly report |
 
 Full OpenAPI documentation at [`docs/swagger.yaml`](swagger.yaml).
+
+---
+
+## CLI Commands
+
+| Command | Description |
+|---|---|
+| `app:seed` | Seeds zodiac signs, report statuses, and permission types |
+| `app:consumer:report` | Consumes report queue (RabbitMQ) |
+| `app:generate:report` | Manually triggers report generation |
 
 ---
 
@@ -268,33 +266,53 @@ Pipeline via **GitHub Actions** (`.github/workflows/ci.yml`):
 ```
 push/PR → main
     │
-    ▼
-┌─ CI Tests ──────────────────────────┐
-│ 1. Build + start containers         │
-│ 2. composer install                  │
-│ 3. Start consumer                    │
-│ 4. Run migrations                    │
-│ 5. PHPUnit (integration tests)       │
-│ 6. Teardown                          │
-└──────────────┬───────────────────────┘
-               │ (only push to main)
-               ▼
-┌─ CD Build Image ────────────────────┐
-│ 1. docker build -t astro-app:sha    │
-└─────────────────────────────────────┘
+    ├──▶ Unit Tests (parallel)
+    │    ┌────────────────────────────────┐
+    │    │ 1. Setup PHP 8.4              │
+    │    │ 2. Cache + install composer   │
+    │    │ 3. PHPUnit --testsuite unit   │
+    │    └────────────────────────────────┘
+    │
+    ├──▶ Integration Tests (parallel)
+    │    ┌────────────────────────────────────────┐
+    │    │ 1. docker compose up (astro, db, redis)│
+    │    │ 2. composer install                    │
+    │    │ 3. Create test DB + migrations         │
+    │    │ 4. app:seed --env=test                 │
+    │    │ 5. PHPUnit --testsuite integration     │
+    │    │ 6. docker compose down                 │
+    │    └────────────────────────────────────────┘
+    │
+    └──▶ CD Build Image (only push to main, after both pass)
+         ┌────────────────────────────────┐
+         │ docker build -t astro-app:sha  │
+         └────────────────────────────────┘
 ```
 
 ---
 
 ## Tests
 
-Integration tests at `tests/App/Integration/UseCase/`:
+### Unit Tests (`tests/Unit/UseCase/`)
+
+Use cases tested in isolation with mocked dependencies.
 
 | Context | Tests |
 |---|---|
 | Authenticate | AuthenticateUseCaseTest |
+| Horoscope | CreateHoroscopeUseCaseTest, FindHoroscopeUseCaseTest |
 | Report | CreateReportUseCaseTest, GenerateReportUseCaseTest |
 | User | CreateUserUseCaseTest, DeleteUserUseCaseTest, FindUserUseCaseTest |
+
+### Integration Tests (`tests/Integration/`)
+
+Tests against real infrastructure (MySQL, Redis).
+
+| Layer | Tests |
+|---|---|
+| Gateway | JwtManagerTest |
+| Memory | TokenRedisTest |
+| Repository | HoroscopeRepositoryTest, ReportRepositoryTest, UserRepositoryTest, ZodiacRepositoryTest |
 
 ```bash
 docker exec -it astro php bin/phpunit --testdox
@@ -304,7 +322,7 @@ docker exec -it astro php bin/phpunit --testdox
 
 ## Benchmark
 
-Load tests with **k6** in 3 scenarios: baseline (1 VU), load (10 VUs), stress (500 VUs).
+Load tests with **k6** in 3 scenarios: baseline, load, stress.
 
 | Metric | php -S | FrankenPHP | Gain |
 |---|---:|---:|---:|
@@ -312,4 +330,4 @@ Load tests with **k6** in 3 scenarios: baseline (1 VU), load (10 VUs), stress (5
 | Throughput | 43 req/s | 75.79 req/s | +76% |
 | HTTP Errors | 33.16% | 0% | -100% |
 
-Details at [`docs/benchmark/README.md`](benchmark/README.md).
+See [docs/benchmark/README.md](benchmark/README.md) for details and how to run.

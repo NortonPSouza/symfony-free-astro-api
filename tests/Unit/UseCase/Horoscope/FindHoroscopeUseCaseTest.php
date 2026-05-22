@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\UseCase\Horoscope;
 
+use App\App\Contracts\Database\MemoryInterface;
 use App\App\Contracts\Repository\HoroscopeRepositoryInterface;
 use App\App\UseCase\Horoscope\Find\FindHoroscopeUseCase;
 use App\App\UseCase\Horoscope\Find\Input\FindHoroscopeInput;
@@ -14,13 +15,17 @@ use PHPUnit\Framework\TestCase;
 class FindHoroscopeUseCaseTest extends TestCase
 {
     private HoroscopeRepositoryInterface $horoscopeRepository;
+    private MemoryInterface $memory;
     private FindHoroscopeUseCase $useCase;
 
     protected function setUp(): void
     {
         $this->horoscopeRepository = $this->createMock(HoroscopeRepositoryInterface::class);
+        $this->memory = $this->createMock(MemoryInterface::class);
+        $this->memory->method('get')->willReturn(null);
         $this->useCase = new FindHoroscopeUseCase(
-            horoscopeRepository: $this->horoscopeRepository
+            horoscopeRepository: $this->horoscopeRepository,
+            memory: $this->memory
         );
     }
 

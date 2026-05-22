@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\UseCase\Horoscope;
 
 use App\App\Contracts\Database\ConnectionInterface;
+use App\App\Contracts\Database\MemoryInterface;
 use App\App\Contracts\Repository\HoroscopeRepositoryInterface;
 use App\App\Contracts\Validation\ValidationUserPermissionInterface;
 use App\App\UseCase\Horoscope\Create\CreateHoroscopeUseCase;
@@ -17,6 +18,7 @@ class CreateHoroscopeUseCaseTest extends TestCase
     private HoroscopeRepositoryInterface $horoscopeRepository;
     private ValidationUserPermissionInterface $validationUserPermission;
     private ConnectionInterface $connection;
+    private MemoryInterface $memory;
     private CreateHoroscopeUseCase $useCase;
 
     private function buildInput(): CreateHoroscopeInput
@@ -45,11 +47,13 @@ class CreateHoroscopeUseCaseTest extends TestCase
         $this->horoscopeRepository = $this->createMock(HoroscopeRepositoryInterface::class);
         $this->validationUserPermission = $this->createMock(ValidationUserPermissionInterface::class);
         $this->connection = $this->createMock(ConnectionInterface::class);
+        $this->memory = $this->createMock(MemoryInterface::class);
 
         $this->useCase = new CreateHoroscopeUseCase(
             horoscopeRepository: $this->horoscopeRepository,
             validationUserPermission: $this->validationUserPermission,
-            connection: $this->connection
+            connection: $this->connection,
+            memory: $this->memory
         );
     }
 

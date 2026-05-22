@@ -3,6 +3,7 @@
 namespace App\App\UseCase\Horoscope\Create;
 
 use App\App\Contracts\Database\ConnectionInterface;
+use App\App\Contracts\Database\MemoryInterface;
 use App\App\Contracts\Repository\HoroscopeRepositoryInterface;
 use App\App\Contracts\Validation\ValidationUserPermissionInterface;
 use App\App\UseCase\Horoscope\Create\Input\CreateHoroscopeInput;
@@ -17,7 +18,8 @@ readonly class CreateHoroscopeUseCase
     public function __construct(
         private HoroscopeRepositoryInterface $horoscopeRepository,
         private ValidationUserPermissionInterface $validationUserPermission,
-        private ConnectionInterface $connection
+        private ConnectionInterface $connection,
+        private MemoryInterface $memory
     )
     {
     }
@@ -26,17 +28,18 @@ readonly class CreateHoroscopeUseCase
     {
         try {
             $this->validationUserPermission->validate($userId, PermissionType::PUBLISH_HOROSCOPE);
-            $builder = new HoroscopeBuilder()
+            $horoscopeBuilder = new HoroscopeBuilder()
                 ->withStartDate($input->getStarDate())
                 ->withEndDate($input->getEndDate());
             $this->connection->begin();
             foreach ($input->getMessages() as $item) {
-                $horoscope = $builder
+                $horoscope = $horoscopeBuilder
                     ->withMessage($item['message'])
                     ->withLuckNumber($item['luck_number'])
                     ->withZodiac(Zodiac::fromPrimitives($item['zodiac_id'], ''))
                     ->build();
                 $this->horoscopeRepository->create($horoscope);
+                $this->memory->delete("horoscope:{$item['zodiac_id']}");
             }
             $this->connection->commit();
             return CreateHoroscopeOutput::success([]);
